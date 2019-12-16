@@ -49,50 +49,38 @@ router.post("/images", async (req, res) => {
     api_secret: process.env.CLOUDINARY_API_SECRET
   });
 
-  let multipleUpload = new Promise(async (resolve, reject) => {
-    let upload_res = new Array();
-    let upload_len = req.body.images.length;
+  cloudinary.uploader
+    .upload_stream(async function(error, result) {
+      if (error) return console.error(error);
 
-    req.body.images.forEach(image => {
-      cloudinary.uploader
-        .upload_stream(function(error, result) {
-          if (error) return console.error(error);
+      if (result) {
+        const { name, env } = req.body;
 
-          if (result) {
-            upload_res.push(result);
-
-            if (upload_res.length === upload_len) {
-              resolve(upload_res);
-            }
-          } else if (error) {
-            console.log(error);
-            reject(error);
+        const project = await Project.findOneAndUpdate(
+          { apiKey: apiToken },
+          {
+            $pull: { images: { name, env } }
+          },
+          {
+            useFindAndModify: false
           }
-        })
-        .end(Buffer.from(image));
-    });
-  })
-    .then(result => result)
-    .catch(error => {
-      console.log({
-        error
-      });
-      return error;
-    });
+        );
 
-  let images = await multipleUpload;
+        await project.update(
+          {
+            $push: { images: { url: result.url, name, env } }
+          },
+          {
+            useFindAndModify: false
+          }
+        );
 
-  await Project.findOneAndUpdate(
-    { apiKey: apiToken },
-    {
-      images
-    },
-    {
-      useFindAndModify: false
-    }
-  );
-
-  res.json({ images });
+        res.json({
+          project
+        });
+      }
+    })
+    .end(Buffer.from(req.body.image));
 });
 
 module.exports = router;
