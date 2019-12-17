@@ -8,10 +8,11 @@ const User = require("../schemas/user");
 // Create a project
 router.post("/", verify, async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
-  const { name } = req.body;
+  const { name, team } = req.body;
 
   const project = await Project.create({
     name,
+    _team: team,
     _createdBy: user._id,
     apiKey: uuidAPIKey.create().apiKey
   });
@@ -36,7 +37,7 @@ router.get("/", verify, async (req, res) => {
 
 // Get a project
 router.get("/:id", verify, async (req, res) => {
-  const project = await Project.findOne({ _id: req.params.id });
+  const project = await Project.findOne({ _id: req.params.id }).populate('_team')
 
   res.json({
     project

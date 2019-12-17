@@ -14,5 +14,6 @@ app.use('/login', require('./routes/login'))
 app.use('/auth', require('./routes/auth'))
 app.use('/users', require('./routes/user'))
 app.use('/projects', require('./routes/project'))
+app.use('/teams', require('./routes/team'))
 
 app.listen(5000, () => console.log(`Running on port ${port} 🎉`))

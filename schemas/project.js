@@ -27,7 +27,8 @@ const projectSchema = new Schema(
         }
       ],
       required: false
-    }
+    },
+    _team: { type: Schema.Types.ObjectId, required: false, ref: 'Team' }
   },
   { timestamps: true, strict: true }
 );
