@@ -96,4 +96,12 @@ router.delete("/:id", verify, async (req, res) => {
   })
 })
 
+router.patch("/:id", verify, async (req, res) => {
+  const project = await Project.findOneAndUpdate({ _id: req.params.id, _createdBy: req.user._id }, req.body, { new: true, useFindAndModify: false })
+
+  res.json({
+    project
+  })
+})
+
 module.exports = router;
