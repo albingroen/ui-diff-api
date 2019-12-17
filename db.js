@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
-const DB_USER = "albingroen" || process.env.DB_USER;
-const DB_PASSWORD = "Opelsaab14" || process.env.DB_PASSWORD;
-const DB_HOST = "ds255728.mlab.com:55728" || process.env.DB_HOST;
-const DB_NAME = "ui-diff" || process.env.DB_NAME;
+const DB_USER = process.env.DB_USER;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_HOST = process.env.DB_HOST;
+const DB_NAME = process.env.DB_NAME;
 
 const mongoUrl = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
 
