@@ -16,4 +16,9 @@ app.use('/users', require('./routes/user'))
 app.use('/projects', require('./routes/project'))
 app.use('/teams', require('./routes/team'))
 
+app.get('/download', function(req, res){
+  const file = `${__dirname}/script.js.txt`;
+  res.download(file); // Set disposition and send it.
+});
+
 app.listen(5000, () => console.log(`Running on port ${port} 🎉`))
