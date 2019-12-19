@@ -66,6 +66,7 @@ router.post("/images", async (req, res) => {
     api_secret: process.env.CLOUDINARY_API_SECRET
   });
 
+  // Upload images to Cloudinary
   cloudinary.uploader
     .upload_stream(async function(error, result) {
       if (error) return console.error(error);
@@ -87,7 +88,9 @@ router.post("/images", async (req, res) => {
 
         await project.update(
           {
-            $push: { images: { url: result.url, name, env } }
+            $push: {
+              images: { url: result.url, publicId: result.public_id, name, env }
+            }
           },
           options
         );
@@ -113,6 +116,19 @@ router.patch("/:id", verify, async (req, res) => {
   const project = await Project.findOneAndUpdate(
     { _id: req.params.id, _createdBy: req.user._id },
     req.body,
+    { new: true, useFindAndModify: false }
+  );
+
+  res.json({
+    project
+  });
+});
+
+// Update token
+router.patch("/:id/updateToken", verify, async (req, res) => {
+  const project = await Project.findOneAndUpdate(
+    { _id: req.params.id, _createdBy: req.user._id },
+    { apiKey: uuidAPIKey.create().apiKey },
     { new: true, useFindAndModify: false }
   );
 
