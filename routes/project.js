@@ -4,6 +4,7 @@ const uuidAPIKey = require("uuid-apikey");
 const verify = require("./verifyToken");
 const Project = require("../schemas/project");
 const User = require("../schemas/user");
+const Team = require("../schemas/team");
 
 // Create a project
 router.post("/", verify, async (req, res) => {
@@ -26,18 +27,29 @@ router.post("/", verify, async (req, res) => {
 router.get("/", verify, async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
 
-  const projects = await Project.find({
+  const userTeams = await Team.find({ members: { $in: user._id } }).select(
+    "_id"
+  );
+
+  const teamProjects = await Project.find({
+    _team: { $in: userTeams }
+  });
+
+  const userProjects = await Project.find({
+    _team: null,
     _createdBy: user._id
   });
 
   res.json({
-    projects
+    projects: [...teamProjects, ...userProjects]
   });
 });
 
 // Get a project
 router.get("/:id", verify, async (req, res) => {
-  const project = await Project.findOne({ _id: req.params.id }).populate('_team')
+  const project = await Project.findOne({ _id: req.params.id }).populate(
+    "_team"
+  );
 
   res.json({
     project
@@ -55,7 +67,7 @@ router.post("/images", async (req, res) => {
   });
 
   cloudinary.uploader
-    .upload_stream(async function (error, result) {
+    .upload_stream(async function(error, result) {
       if (error) return console.error(error);
 
       if (result) {
@@ -90,19 +102,23 @@ router.post("/images", async (req, res) => {
 
 // Delete a project
 router.delete("/:id", verify, async (req, res) => {
-  await Project.deleteOne({ _id: req.params.id, _createdBy: req.user._id })
+  await Project.deleteOne({ _id: req.params.id, _createdBy: req.user._id });
 
   res.json({
     success: true
-  })
-})
+  });
+});
 
 router.patch("/:id", verify, async (req, res) => {
-  const project = await Project.findOneAndUpdate({ _id: req.params.id, _createdBy: req.user._id }, req.body, { new: true, useFindAndModify: false })
+  const project = await Project.findOneAndUpdate(
+    { _id: req.params.id, _createdBy: req.user._id },
+    req.body,
+    { new: true, useFindAndModify: false }
+  );
 
   res.json({
     project
-  })
-})
+  });
+});
 
 module.exports = router;

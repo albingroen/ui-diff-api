@@ -68,7 +68,7 @@ async function main() {
             spinner.text = `Taking screenshots [${progress}/${pages.length * (args.env ? 1 : 2) + 1}]`
 
             // Upload image to ui-diff
-            axios.post('http://localhost:5000/projects/images', { image: imageBuffer, env: variant, name }, { headers: { "api-token": process.env.UI_DIFF_API_TOKEN } }).then(() => {
+            axios.post('http://localhost:5000/projects/images', { image: imageBuffer, env: variant, name }, { headers: { "api-token": config.token } }).then(() => {
               console.log({
                 success: true
               })
