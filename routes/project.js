@@ -73,23 +73,23 @@ router.post("/images", async (req, res) => {
       if (result) {
         const { name, env } = req.body;
 
+        const options = {
+          useFindAndModify: false
+        };
+
         const project = await Project.findOneAndUpdate(
           { apiKey: apiToken },
           {
             $pull: { images: { name, env } }
           },
-          {
-            useFindAndModify: false
-          }
+          options
         );
 
         await project.update(
           {
             $push: { images: { url: result.url, name, env } }
           },
-          {
-            useFindAndModify: false
-          }
+          options
         );
 
         res.json({

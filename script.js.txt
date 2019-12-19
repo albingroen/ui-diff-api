@@ -60,6 +60,8 @@ async function main() {
         .screenshot({
           encoding: 'binary',
           fullPage: true,
+          type: 'jpeg',
+          quality: '65'
         })
         .then((imageBuffer) => {
           progress = progress + 1
