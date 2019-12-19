@@ -4,6 +4,7 @@ const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const User = require("../schemas/user");
 
+// Authenticate user
 router.post("/", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
   const client_secret = process.env.GITHUB_CLIENT_SECRET;
@@ -39,8 +40,8 @@ router.post("/", (req, res) => {
             user
           });
         })
-        .catch(userErr => {
-          console.error(userErr);
+        .catch(err => {
+          console.error(err);
         });
     })
     .catch(err => {

@@ -112,6 +112,7 @@ router.delete("/:id", verify, async (req, res) => {
   });
 });
 
+// Update project
 router.patch("/:id", verify, async (req, res) => {
   const project = await Project.findOneAndUpdate(
     { _id: req.params.id, _createdBy: req.user._id },
@@ -124,7 +125,7 @@ router.patch("/:id", verify, async (req, res) => {
   });
 });
 
-// Update token
+// Update project token
 router.patch("/:id/updateToken", verify, async (req, res) => {
   const project = await Project.findOneAndUpdate(
     { _id: req.params.id, _createdBy: req.user._id },

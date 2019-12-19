@@ -1,5 +1,6 @@
 const router = require('express').Router()
 
+// Github login retrieval
 router.get('/', (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID
 
