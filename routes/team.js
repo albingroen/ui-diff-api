@@ -22,7 +22,7 @@ router.get("/:id", verify, async (req, res) => {
   const team = await Team.findOne({
     _id: req.params.id,
     members: { $in: req.user._id }
-  });
+  }).populate('members')
 
   res.json({
     team
