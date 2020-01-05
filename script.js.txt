@@ -70,7 +70,7 @@ async function main() {
             spinner.text = `Taking screenshots [${progress}/${pages.length * (args.env ? 1 : 2) + 1}]`
 
             // Upload image to ui-diff
-            await axios.post('http://localhost:5000/projects/images', { image: imageBuffer, env: variant, name }, { headers: { "api-token": config.token } })
+            await axios.post('https://infinite-plains-43173.herokuapp.com/projects/images', { image: imageBuffer, env: variant, name }, { headers: { "api-token": config.token } })
 
             // On last page close browser and stop spinner
             if (progress === pages.length * (!args.env ? 2 : 1)) {
