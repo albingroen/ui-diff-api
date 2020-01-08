@@ -46,10 +46,15 @@ router.get("/", verify, async (req, res) => {
 });
 
 // Get a project
-router.get("/:id", verify, async (req, res) => {
+router.get("/:id", verify, async (req, res, next) => {
   const project = await Project.findOne({ _id: req.params.id }).populate(
     "_team"
   );
+
+  if(!project) {
+    res.status(400)
+    return console.error('Project not found');
+  }
 
   res.json({
     project
@@ -57,7 +62,7 @@ router.get("/:id", verify, async (req, res) => {
 });
 
 // Upload images
-router.post("/images", async (req, res) => {
+router.post("/images", verify, async (req, res) => {
   const apiToken = req.header("api-token");
 
   cloudinary.config({
