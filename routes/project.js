@@ -52,13 +52,18 @@ router.get("/:id", verify, async (req, res) => {
     select: 'name'
   });
 
+  if(!project) {
+    res.status(400)
+    return console.error('Project not found');
+  }
+
   res.json({
     project
   });
 });
 
 // Upload images
-router.post("/images", async (req, res) => {
+router.post("/images", verify, async (req, res) => {
   const apiToken = req.header("api-token");
 
   cloudinary.config({

@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer')
 const axios = require('axios')
 const ora = require('ora')
-const pages = require('./pages')
+const pages = require('./ui-diff-pages')
 const config = require('./ui-diff-config')
 
 // Parsed command line args
@@ -61,22 +61,16 @@ async function main() {
           encoding: 'binary',
           fullPage: true,
           type: 'jpeg',
-          quality: '65'
+          quality: 65
         })
         .then((imageBuffer) => {
           progress = progress + 1
-          page.close().then(() => {
+          page.close().then(async () => {
             // Update spinner
             spinner.text = `Taking screenshots [${progress}/${pages.length * (args.env ? 1 : 2) + 1}]`
 
             // Upload image to ui-diff
-            axios.post('http://localhost:5000/projects/images', { image: imageBuffer, env: variant, name }, { headers: { "api-token": config.token } }).then(() => {
-              console.log({
-                success: true
-              })
-            }).catch(err => {
-              console.error(err)
-            })
+            await axios.post('https://infinite-plains-43173.herokuapp.com/projects/images', { image: imageBuffer, env: variant, name }, { headers: { "api-token": config.token } })
 
             // On last page close browser and stop spinner
             if (progress === pages.length * (!args.env ? 2 : 1)) {
