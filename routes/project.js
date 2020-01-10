@@ -47,9 +47,10 @@ router.get("/", verify, async (req, res) => {
 
 // Get a project
 router.get("/:id", verify, async (req, res) => {
-  const project = await Project.findOne({ _id: req.params.id }).populate(
-    "_team"
-  );
+  const project = await Project.findOne({ _id: req.params.id }).populate({
+    path: '_createdBy _team',
+    select: 'name'
+  });
 
   res.json({
     project
