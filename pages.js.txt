@@ -1,0 +1,8 @@
+// Add any page you want ui-diff to screenshot
+
+module.exports = [
+  {
+    name: 'start',
+    path: '/'
+  }
+]

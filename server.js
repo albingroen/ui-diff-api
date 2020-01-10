@@ -24,8 +24,20 @@ app.use("/projects", require("./routes/project"));
 app.use("/teams", require("./routes/team"));
 
 app.get("/download", function(req, res) {
-  const file = `${__dirname}/script.js.txt`;
-  res.download(file); // Set disposition and send it.
+  const { file } = req.query;
+
+  if (!file) {
+    res.status(400);
+    return;
+  }
+
+  const script = `${__dirname}/script.js.txt`;
+  const pages = `${__dirname}/pages.js.txt`;
+  const config = `${__dirname}/config.js.txt`;
+
+  const filesToDownload = { script, pages, config };
+
+  res.download(filesToDownload[file]);
 });
 
 app.listen(port, () => console.log(`Running on port ${port} 🎉`));

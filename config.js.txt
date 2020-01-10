@@ -1,0 +1,16 @@
+const envs = {
+  // Required environments
+  local: "URL TO YOUR LOCAL ENVIRONMENT",
+  live: "URL TO YOUR LIVE ENVIRONMENT",
+
+  // Any environment you want. For example:
+  dev: "URL TO YOUR DEV ENVIRONMENT",
+  staging: "URL TO YOUR STAGING ENVIRONMENT",
+}
+
+const token = "PROJECT API TOKEN"
+
+module.exports = {
+  envs,
+  token
+}
