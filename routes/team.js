@@ -22,7 +22,7 @@ router.get("/:id", verify, async (req, res) => {
   const team = await Team.findOne({
     _id: req.params.id,
     members: { $in: req.user._id }
-  }).populate('members')
+  }).populate("members");
 
   res.json({
     team
@@ -33,11 +33,26 @@ router.get("/:id", verify, async (req, res) => {
 router.get("/", verify, async (req, res) => {
   const teams = await Team.find({
     members: { $in: req.user._id }
-  })
+  });
 
   res.json({
     teams
-  })
-})
+  });
+});
+
+// Update team
+router.patch("/:id", verify, async (req, res) => {
+  const team = await Team.findOneAndUpdate(
+    {
+      _id: req.params.id,
+      members: { $in: req.user._id }
+    },
+    req.body
+  ).populate("members");
+
+  res.json({
+    team
+  });
+});
 
 module.exports = router;
