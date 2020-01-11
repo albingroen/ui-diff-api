@@ -67,7 +67,7 @@ async function main() {
           progress = progress + 1
           page.close().then(async () => {
             // Update spinner
-            spinner.text = `Taking screenshots [${progress}/${pages.length * (args.env ? 1 : 2) + 1}]`
+            spinner.text = `Taking screenshots [${progress}/${pages.length * (args.env ? 1 : 2)}]`
 
             // Upload image to ui-diff
             await axios.post('https://infinite-plains-43173.herokuapp.com/projects/images', { image: imageBuffer, env: variant, name }, { headers: { "api-token": config.token } })
