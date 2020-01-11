@@ -63,7 +63,7 @@ router.get("/:id", verify, async (req, res) => {
 });
 
 // Upload images
-router.post("/images", verify, async (req, res) => {
+router.post("/images", async (req, res) => {
   const apiToken = req.header("api-token");
 
   cloudinary.config({
