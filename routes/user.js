@@ -6,7 +6,7 @@ const Team = require("../schemas/team");
 // Get user
 router.get("/", verify, async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
-  const teams = await Team.find({ members: { $in: user._id } });
+  const teams = await Team.find({ 'members._user': { $in: user._id } });
 
   res.json({
     user: {

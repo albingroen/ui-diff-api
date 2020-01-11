@@ -6,7 +6,12 @@ const teamSchema = new Schema(
   {
     name: { type: String, required: true },
     members: {
-      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+      type: [
+        {
+          _user: { type: Schema.Types.ObjectId, ref: "User" },
+          role: { type: String, required: true }
+        }
+      ],
       required: true
     },
     logo: { type: String, required: false }

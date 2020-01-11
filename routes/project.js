@@ -27,7 +27,7 @@ router.post("/", verify, async (req, res) => {
 router.get("/", verify, async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
 
-  const userTeams = await Team.find({ members: { $in: user._id } }).select(
+  const userTeams = await Team.find({ 'members._user': { $in: user._id } }).select(
     "_id"
   );
 
