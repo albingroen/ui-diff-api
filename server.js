@@ -22,6 +22,7 @@ app.use("/auth", require("./routes/auth"));
 app.use("/users", require("./routes/user"));
 app.use("/projects", require("./routes/project"));
 app.use("/teams", require("./routes/team"));
+app.use("/invitations", require("./routes/invitation"));
 
 app.get("/download", function(req, res) {
   const { file } = req.query;
