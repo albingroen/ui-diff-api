@@ -83,4 +83,24 @@ router.patch("/:id/update-member", verify, async (req, res) => {
   });
 });
 
+// Delete member
+router.patch("/:id/delete-member", verify, async (req, res) => {
+  const team = await Team.findOneAndUpdate(
+    {
+      _id: req.params.id,
+      "members._user": { $in: req.body.userId }
+    },
+    {
+      $pull: { members: { "_user": req.body.userId } }
+    },
+    {
+      new: true
+    }
+  )
+
+  res.json({
+    team
+  });
+});
+
 module.exports = router;
