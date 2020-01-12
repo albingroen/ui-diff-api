@@ -8,7 +8,7 @@ router.get("/", (req, res) => {
   let url;
 
   if (!invitation || invitation === "undefined") {
-    url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}`;
+					url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}?redirect_uri=https://ui-diff-frontend.now.sh`;
   } else {
     url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}&redirect_uri=https://ui-diff-frontend.now.sh/login?invitation=${invitation}`;
   }
