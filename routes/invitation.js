@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const verify = require("./verifyToken");
 const Invitation = require("../schemas/invitation");
+const { sendMail } = require("../utils");
 const Team = require("../schemas/team");
 
 // Create a invitation
@@ -17,7 +18,13 @@ router.post("/", verify, async (req, res) => {
     role,
     active: true,
     _team: team._id
-  }).populate("_team");
+  });
+
+  sendMail(
+    email,
+    `You've been invited to ${team.name} on ui-diff!`,
+    `Click the link to get up and running: https://app.ui-diff.com/login?invitation=${invitation._id}`
+  );
 
   res.json({
     invitation
@@ -75,6 +82,24 @@ router.patch("/:id", async (req, res) => {
   res.json({
     invitation
   });
+});
+
+// Delete invitation
+router.delete("/:id", verify, async (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    res.status(400);
+    return res.json();
+  }
+
+  const userTeams = await Team.find({
+    "members._user": { $in: req.user._id }
+  });
+
+  await Invitation.findOneAndDelete({ _id: id, _team: { $in: userTeams } });
+
+  res.json();
 });
 
 module.exports = router;
