@@ -23,7 +23,7 @@ router.post("/", verify, async (req, res) => {
   sendMail(
     email,
     `You've been invited to ${team.name} on ui-diff!`,
-    `<div><h1>Welcome to ui-diff!</h1><p>Click the link to get up and running: https://app.ui-diff.com/login?invitation=${invitation._id}</p></div>`
+    `Welcome to ui-diff! Click the link to get up and running: https://app.ui-diff.com/login?invitation=${invitation._id}`
   );
 
   res.json({

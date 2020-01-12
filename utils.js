@@ -11,10 +11,10 @@ function sendMail(email, subject, text) {
   });
 
   var mailOptions = {
-    from: 'albin@ui-diff.com',
+    from: 'no-reply@ui-diff.com',
     to: email,
     subject,
-    html: text
+    text
   };
   
   transporter.sendMail(mailOptions, function(error, info){
