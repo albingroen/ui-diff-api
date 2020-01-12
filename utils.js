@@ -11,7 +11,7 @@ function sendMail(email, subject, text) {
   });
 
   var mailOptions = {
-    from: 'no-reply@ui-diff.com',
+    from: 'albin@ui-diff.com',
     to: email,
     subject,
     text
