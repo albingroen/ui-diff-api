@@ -14,7 +14,7 @@ function sendMail(email, subject, text) {
     from: 'albin@ui-diff.com',
     to: email,
     subject,
-    text
+    html: text
   };
   
   transporter.sendMail(mailOptions, function(error, info){
