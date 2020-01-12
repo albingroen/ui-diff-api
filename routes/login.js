@@ -10,7 +10,7 @@ router.get("/", (req, res) => {
   if (!invitation || invitation === "undefined") {
     url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}`;
   } else {
-    url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}&redirect_uri=https://app.ui-diff.com/login?invitation=${invitation}`;
+    url = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}&redirect_uri=https://ui-diff-frontend.now.sh/login?invitation=${invitation}`;
   }
 
   res.json({
