@@ -25,13 +25,9 @@ router.post("/", (req, res) => {
         .then(async userRes => {
           let user = await User.findOne({ email: userRes.data.email });
 
-          res.json({
-            userRes
-          })
-
           if (!user) {
             user = await User.create({
-              name: userRes.data.name,
+              name: userRes.data.name || userRes.data.login,
               email: userRes.data.email,
               avatar: userRes.data.avatar_url
             });
@@ -46,16 +42,12 @@ router.post("/", (req, res) => {
         })
         .catch(err => {
           console.error(err);
-          res.json({
-            err
-          })
+          res.error(err)
         });
     })
     .catch(err => {
       console.error(err);
-      res.json({
-        err
-      })
+      res.error(err)
     });
 });
 
