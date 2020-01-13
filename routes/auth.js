@@ -25,6 +25,10 @@ router.post("/", (req, res) => {
         .then(async userRes => {
           let user = await User.findOne({ email: userRes.data.email });
 
+          res.json({
+            userRes
+          })
+
           if (!user) {
             user = await User.create({
               name: userRes.data.name,
