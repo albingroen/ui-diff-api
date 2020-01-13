@@ -27,7 +27,7 @@ function sendMail(email, subject, text) {
   });
 }
 
-const clientUrl = "http://localhost:3000";
+const clientUrl = "https://app.ui-diff.com";
 
 module.exports = {
   sendMail,
