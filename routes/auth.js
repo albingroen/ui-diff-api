@@ -42,10 +42,16 @@ router.post("/", (req, res) => {
         })
         .catch(err => {
           console.error(err);
+          res.json({
+            err
+          })
         });
     })
     .catch(err => {
       console.error(err);
+      res.json({
+        err
+      })
     });
 });
 
