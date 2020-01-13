@@ -24,15 +24,15 @@ router.post("/", (req, res) => {
         })
         .then(async userRes => {
           let user = await User.findOne({
-            email: userRes.data.email,
-            name: { $in: [userRes.data.name, userRes.data.login] }
+            githubId: userRes.data.id
           });
 
           if (!user) {
             user = await User.create({
               name: userRes.data.name || userRes.data.login,
               email: userRes.data.email,
-              avatar: userRes.data.avatar_url
+              avatar: userRes.data.avatar_url,
+              githubId: userRes.data.id
             });
           }
 

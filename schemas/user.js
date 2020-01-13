@@ -6,7 +6,8 @@ const userSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: false },
-    avatar: { type: String, required: false }
+    avatar: { type: String, required: false },
+    githubId: { type: String, required: false }
   },
   { timestamps: true, strict: true }
 );
