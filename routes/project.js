@@ -27,9 +27,9 @@ router.post("/", verify, async (req, res) => {
 router.get("/", verify, async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
 
-  const userTeams = await Team.find({ 'members._user': { $in: user._id } }).select(
-    "_id"
-  );
+  const userTeams = await Team.find({
+    "members._user": { $in: user._id }
+  }).select("_id");
 
   const teamProjects = await Project.find({
     _team: { $in: userTeams }
@@ -48,13 +48,13 @@ router.get("/", verify, async (req, res) => {
 // Get a project
 router.get("/:id", verify, async (req, res) => {
   const project = await Project.findOne({ _id: req.params.id }).populate({
-    path: '_createdBy _team',
-    select: 'name'
+    path: "_createdBy _team",
+    select: "name"
   });
 
-  if(!project) {
-    res.status(400)
-    return console.error('Project not found');
+  if (!project) {
+    res.status(400);
+    return console.error("Project not found");
   }
 
   res.json({
@@ -111,11 +111,36 @@ router.post("/images", async (req, res) => {
 
 // Delete a project
 router.delete("/:id", verify, async (req, res) => {
-  await Project.deleteOne({ _id: req.params.id, _createdBy: req.user._id });
+  const { id } = req.params;
+  const { user } = req;
 
-  res.json({
-    success: true
-  });
+  const project = await Project.findOne({ _id: id });
+
+  if (project._team) {
+    const userTeams = await Team.find({
+      "members._user": { $in: user._id }
+    }).select("_id members");
+
+    const userAdminTeams = userTeams.filter(team => {
+      return team.members.find(
+        member => String(member._user) === user._id && member.role === "admin"
+      );
+    });
+
+    await Project.deleteOne({
+      _id: id,
+      _team: { $in: userAdminTeams }
+    }).catch(() => res.status(401))
+
+    res.json()
+  } else {
+    await Project.deleteOne({
+      _id: id,
+      _createdBy: user._id
+    }).catch(() => res.status(401))
+
+    res.json()
+  }
 });
 
 // Update project
