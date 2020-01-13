@@ -23,7 +23,10 @@ router.post("/", (req, res) => {
           headers: { Authorization: `token ${token}` }
         })
         .then(async userRes => {
-          let user = await User.findOne({ email: userRes.data.email });
+          let user = await User.findOne({
+            email: userRes.data.email,
+            name: { $in: [userRes.data.name, userRes.data.login] }
+          });
 
           if (!user) {
             user = await User.create({
@@ -42,12 +45,12 @@ router.post("/", (req, res) => {
         })
         .catch(err => {
           console.error(err);
-          res.error(err)
+          res.error(err);
         });
     })
     .catch(err => {
       console.error(err);
-      res.error(err)
+      res.error(err);
     });
 });
 
