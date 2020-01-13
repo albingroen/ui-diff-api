@@ -9,11 +9,11 @@ router.get("/", (req, res) => {
 
   if (!invitation || invitation === "undefined") {
     res.json({
-      url: `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}&redirect_uri=${baseUrl}/login`
+      url: `https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${baseUrl}/login`
     });
   } else {
     res.json({
-      url: `https://github.com/login/oauth/authorize?scope=user:email&client_id=${client_id}&redirect_uri=${baseUrl}/login?invitation=${invitation}`
+      url: `https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${baseUrl}/login?invitation=${invitation}`
     });
   }
 });
