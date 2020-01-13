@@ -27,6 +27,9 @@ function sendMail(email, subject, text) {
   });
 }
 
+const clientUrl = "http://localhost:3000";
+
 module.exports = {
-  sendMail
+  sendMail,
+  clientUrl
 }

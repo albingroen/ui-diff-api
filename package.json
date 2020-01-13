@@ -18,6 +18,7 @@
     "mongoose": "^5.8.1",
     "nodemailer": "^6.4.2",
     "query-string": "^6.9.0",
+    "uuid": "^3.3.3",
     "uuid-apikey": "^1.4.6"
   }
 }
