@@ -1,9 +1,9 @@
-const nodemailer = require('nodemailer')
-require('dotenv').config()
+const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 function sendMail(email, subject, text) {
   let transporter = nodemailer.createTransport({
-    host: 'smtp.sendgrid.net',
+    host: "smtp.sendgrid.net",
     port: 465,
     auth: {
       user: process.env.SENDGRID_USERNAME,
@@ -12,32 +12,47 @@ function sendMail(email, subject, text) {
   });
 
   var mailOptions = {
-    from: 'albin@ui-diff.com',
+    from: "albin@ui-diff.com",
     to: email,
     subject,
     text
   };
-  
-  transporter.sendMail(mailOptions, function(error, info){
+
+  transporter.sendMail(mailOptions, function(error, info) {
     if (error) {
-      res.end(error)
+      res.end(error);
     } else {
-      console.log('Email sent: ' + info.response);
-      res.json(info.response)
+      console.log("Email sent: " + info.response);
+      res.json(info.response);
     }
   });
 }
 
-const env = "live"
+function getImageUrlWithSize(result, wantedSize) {
+  const defaultUrl = "https://res.cloudinary.com/albin-groen/image/upload";
+
+  const urlWithCustomWidth = width =>
+    `${defaultUrl}/w_${width}/v${result.version}/${result.public_id}.jpg`;
+
+  const sizes = {
+    sm: urlWithCustomWidth(0.5),
+    lg: urlWithCustomWidth(1.5)
+  };
+
+  return sizes[wantedSize] || "";
+}
+
+const env = "live";
 
 const envs = {
-  live: 'https://app.ui-diff.com',
-  local: "http://localhost:3000"
-}
+  live: "https://app.ui-diff.com",
+  local: "http://localhost:3001"
+};
 
 const clientUrl = envs[env];
 
 module.exports = {
   sendMail,
-  clientUrl
-}
+  clientUrl,
+  getImageUrlWithSize
+};

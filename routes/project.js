@@ -5,6 +5,7 @@ const verify = require("./verifyToken");
 const Project = require("../schemas/project");
 const User = require("../schemas/user");
 const Team = require("../schemas/team");
+const { getImageUrlWithSize } = require("../utils");
 
 // Create a project
 router.post("/", verify, async (req, res) => {
@@ -115,7 +116,14 @@ router.post("/images", async (req, res) => {
         await project.update(
           {
             $push: {
-              images: { url: result.url, publicId: result.public_id, name, env }
+              images: {
+                default: result.secure_url,
+                small: getImageUrlWithSize(result, 'sm'),
+                large: getImageUrlWithSize(result, 'lg'),
+                publicId: result.public_id,
+                name,
+                env
+              }
             }
           },
           options

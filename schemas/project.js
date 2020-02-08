@@ -12,7 +12,15 @@ const projectSchema = new Schema(
     images: {
       type: [
         {
-          url: {
+          small: {
+            type: String,
+            required: String
+          },
+          default: {
+            type: String,
+            required: String
+          },
+          large: {
             type: String,
             required: String
           },
@@ -27,7 +35,7 @@ const projectSchema = new Schema(
           publicId: {
             type: String,
             required: true
-          }
+          },
         }
       ],
       required: false
