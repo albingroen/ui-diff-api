@@ -84,6 +84,25 @@ router.post("/images", async (req, res) => {
           useFindAndModify: false
         };
 
+        // Find current image in project
+        const currentProject = await Project.findOne(
+          { apiKey: apiToken },
+          {
+            images: { $elemMatch: { name, env } }
+          },
+          options
+        );
+
+        // Delete current image before uploading new version
+        if (
+          currentProject &&
+          currentProject.images &&
+          currentProject.images.length
+        ) {
+          await cloudinary.uploader.destroy(currentProject.images[0].publicId);
+        }
+
+        // Remove the image from the databse
         const project = await Project.findOneAndUpdate(
           { apiKey: apiToken },
           {
@@ -92,6 +111,7 @@ router.post("/images", async (req, res) => {
           options
         );
 
+        // Add the new image
         await project.update(
           {
             $push: {
@@ -130,16 +150,16 @@ router.delete("/:id", verify, async (req, res) => {
     await Project.deleteOne({
       _id: id,
       _team: { $in: userAdminTeams }
-    }).catch(() => res.status(401))
+    }).catch(() => res.status(401));
 
-    res.json()
+    res.json();
   } else {
     await Project.deleteOne({
       _id: id,
       _createdBy: user._id
-    }).catch(() => res.status(401))
+    }).catch(() => res.status(401));
 
-    res.json()
+    res.json();
   }
 });
 
