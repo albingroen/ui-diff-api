@@ -8,7 +8,7 @@ const User = require("../schemas/user");
 const Team = require("../schemas/team");
 const { getImageUrlWithSize } = require("../utils");
 
-deepai.setApiKey('f46ff0b8-a080-45df-a7a0-e740ced8d539');
+deepai.setApiKey(process.env.DEEP_AI_API_KEY);
 
 // Create a project
 router.post("/", verify, async (req, res) => {
