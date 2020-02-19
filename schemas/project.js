@@ -36,6 +36,11 @@ const projectSchema = new Schema(
             type: String,
             required: true
           },
+          diff: {
+            type: Boolean,
+            required: false,
+            default: false
+          }
         }
       ],
       required: false

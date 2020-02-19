@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const deepai = require('deepai');
 const cloudinary = require("cloudinary").v2; // Make sure to use v2
 const uuidAPIKey = require("uuid-apikey");
 const verify = require("./verifyToken");
@@ -6,6 +7,8 @@ const Project = require("../schemas/project");
 const User = require("../schemas/user");
 const Team = require("../schemas/team");
 const { getImageUrlWithSize } = require("../utils");
+
+deepai.setApiKey(process.env.DEEP_AI_API_KEY);
 
 // Create a project
 router.post("/", verify, async (req, res) => {
@@ -95,13 +98,21 @@ router.post("/images", async (req, res) => {
         );
 
         // Delete current image before uploading new version
+        let currentImage;
+
         if (
           currentProject &&
           currentProject.images &&
           currentProject.images.length
         ) {
-          await cloudinary.uploader.destroy(currentProject.images[0].publicId);
+          currentImage = currentProject.images[0]
+          await cloudinary.uploader.destroy(currentImage.publicId);
         }
+
+        const imageDiffRes = await deepai.callStandardApi("image-similarity", {
+          image1: currentImage.default,
+          image2: result.secure_url,
+        });
 
         // Remove the image from the databse
         const project = await Project.findOneAndUpdate(
@@ -122,7 +133,8 @@ router.post("/images", async (req, res) => {
                 large: getImageUrlWithSize(result, 'lg'),
                 publicId: result.public_id,
                 name,
-                env
+                env,
+                diff: imageDiffRes.output.distance !== 0
               }
             }
           },
