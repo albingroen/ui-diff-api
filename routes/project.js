@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const deepai = require('deepai');
 const cloudinary = require("cloudinary").v2; // Make sure to use v2
 const uuidAPIKey = require("uuid-apikey");
 const verify = require("./verifyToken");
@@ -7,8 +6,6 @@ const Project = require("../schemas/project");
 const User = require("../schemas/user");
 const Team = require("../schemas/team");
 const { getImageUrlWithSize } = require("../utils");
-
-deepai.setApiKey(process.env.DEEP_AI_API_KEY);
 
 // Create a project
 router.post("/", verify, async (req, res) => {
@@ -109,11 +106,6 @@ router.post("/images", async (req, res) => {
           await cloudinary.uploader.destroy(currentImage.publicId);
         }
 
-        const imageDiffRes = await deepai.callStandardApi("image-similarity", {
-          image1: currentImage.default,
-          image2: result.secure_url,
-        });
-
         // Remove the image from the databse
         const project = await Project.findOneAndUpdate(
           { apiKey: apiToken },
@@ -134,7 +126,6 @@ router.post("/images", async (req, res) => {
                 publicId: result.public_id,
                 name,
                 env,
-                diff: imageDiffRes.output.distance !== 0
               }
             }
           },
