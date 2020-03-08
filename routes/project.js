@@ -137,7 +137,7 @@ router.post("/images", async (req, res) => {
                 publicId: result.public_id,
                 name,
                 env,
-                diff: diff.output.distance !== 0
+                diff: diff ? diff.output.distance !== 0 : false
               }
             }
           },
