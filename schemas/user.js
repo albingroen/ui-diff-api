@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 // create a schema
 const userSchema = new Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String },
     email: { type: String, required: false },
     avatar: { type: String, required: false },
-    githubId: { type: String, required: false }
+    socialId: { type: String, required: false }
   },
   { timestamps: true, strict: true }
 );

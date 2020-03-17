@@ -42,17 +42,19 @@ function getImageUrlWithSize(result, wantedSize) {
   return sizes[wantedSize] || "";
 }
 
-const env = "live";
+const env = "local";
 
 const envs = {
   live: "https://app.ui-diff.com",
-  local: "http://localhost:3001"
+  local: "http://localhost:3000"
 };
 
 const clientUrl = envs[env];
+const redirectUrl = (method) => `${envs[env]}?method=${method}`
 
 module.exports = {
   sendMail,
   clientUrl,
-  getImageUrlWithSize
+  getImageUrlWithSize,
+  redirectUrl
 };
