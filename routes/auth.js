@@ -1,9 +1,8 @@
 const router = require("express").Router();
 const queryString = require("query-string");
 const axios = require("axios");
-const jwt = require("jsonwebtoken");
 const User = require("../schemas/user");
-const { redirectUrl } = require("../utils");
+const { redirectUrl, createTokens } = require("../utils");
 
 router.post("/github", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
@@ -36,7 +35,7 @@ router.post("/github", (req, res) => {
             });
           }
 
-          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+          const { token } = createTokens(user, process.env.JWT_SECRET)
 
           res.header("auth-token", token).send({
             token,
@@ -85,7 +84,7 @@ router.post("/gitlab", (req, res) => {
             });
           }
 
-          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+          const { token } = createTokens(user, process.env.JWT_SECRET)
 
           res.header("auth-token", token).send({
             token,
@@ -132,7 +131,7 @@ router.post("/google", (req, res) => {
             });
           }
 
-          const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+          const { token } = createTokens(user, process.env.JWT_SECRET)
 
           res.header("auth-token", token).send({
             token,

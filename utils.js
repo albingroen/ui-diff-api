@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
@@ -52,9 +53,21 @@ const envs = {
 const clientUrl = envs[env];
 const redirectUrl = (method) => `${envs[env]}?method=${method}`
 
+const createTokens = (user, secret1) => {
+  const token = jwt.sign({ _id: user._id }, secret1);
+
+  return { token }
+}
+
+const setTokens = (res, token) => {
+  res.set('auth-token', token)
+}
+
 module.exports = {
   sendMail,
   clientUrl,
   getImageUrlWithSize,
-  redirectUrl
+  redirectUrl,
+  createTokens,
+  setTokens
 };
