@@ -5,7 +5,11 @@ const port = process.env.PORT || 5000;
 require("dotenv").config();
 require("./db");
 
-app.use(cors());
+const corsOptions = {
+  exposedHeaders: 'x-token',
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 app.use(bodyParser.json({ limit: "500mb", extended: true }));
 

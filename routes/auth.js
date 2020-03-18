@@ -37,8 +37,8 @@ router.post("/github", (req, res) => {
 
           const { token } = createTokens(user, process.env.JWT_SECRET)
 
-          res.header("auth-token", token).send({
-            token,
+          res.set("x-token", token)
+          res.send({
             user
           });
         })
@@ -86,8 +86,8 @@ router.post("/gitlab", (req, res) => {
 
           const { token } = createTokens(user, process.env.JWT_SECRET)
 
-          res.header("auth-token", token).send({
-            token,
+          res.set("x-token", token)
+          res.send({
             user
           });
         })
@@ -133,8 +133,8 @@ router.post("/google", (req, res) => {
 
           const { token } = createTokens(user, process.env.JWT_SECRET)
 
-          res.header("auth-token", token).send({
-            token,
+          res.set("x-token", token)
+          res.send({
             user
           });
         })

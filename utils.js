@@ -60,7 +60,7 @@ const createTokens = (user, secret1) => {
 }
 
 const setTokens = (res, token) => {
-  res.set('auth-token', token)
+  res.set('x-token', token)
 }
 
 module.exports = {
