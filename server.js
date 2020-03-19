@@ -6,7 +6,7 @@ require("dotenv").config();
 require("./db");
 
 const corsOptions = {
-  exposedHeaders: 'x-token',
+  exposedHeaders: ["x-token", "x-refresh-token"]
 };
 
 app.use(cors(corsOptions));

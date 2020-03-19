@@ -51,17 +51,21 @@ const envs = {
 };
 
 const clientUrl = envs[env];
-const redirectUrl = (method) => `${envs[env]}?method=${method}`
+const redirectUrl = method => `${envs[env]}?method=${method}`;
 
-const createTokens = (user, secret1) => {
-  const token = jwt.sign({ _id: user._id }, secret1);
+const createTokens = (user, secret1, secret2) => {
+  const token = jwt.sign({ _id: user._id }, secret1, { expiresIn: "5m" });
+  const refreshToken = jwt.sign({ _id: user._id }, secret2, {
+    expiresIn: "7d"
+  });
 
-  return { token }
-}
+  return { token, refreshToken };
+};
 
-const setTokens = (res, token) => {
-  res.set('x-token', token)
-}
+const setTokens = (res, token, refreshToken) => {
+  res.set("x-token", token);
+  res.set("x-refresh-token", refreshToken);
+};
 
 module.exports = {
   sendMail,

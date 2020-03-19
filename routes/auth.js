@@ -2,7 +2,7 @@ const router = require("express").Router();
 const queryString = require("query-string");
 const axios = require("axios");
 const User = require("../schemas/user");
-const { redirectUrl, createTokens } = require("../utils");
+const { redirectUrl, createTokens, setTokens } = require("../utils");
 
 router.post("/github", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
@@ -35,9 +35,14 @@ router.post("/github", (req, res) => {
             });
           }
 
-          const { token } = createTokens(user, process.env.JWT_SECRET)
+          const { token, refreshToken } = createTokens(
+            user,
+            process.env.JWT_SECRET,
+            process.env.JWT_SECRET_2
+          );
 
-          res.set("x-token", token)
+          setTokens(res, token, refreshToken);
+
           res.send({
             user
           });
@@ -61,7 +66,7 @@ router.post("/gitlab", (req, res) => {
       client_secret,
       code: req.body.code,
       grant_type: "authorization_code",
-      redirect_uri: redirectUrl('gitlab'),
+      redirect_uri: redirectUrl("gitlab")
     })
     .then(result => {
       const token = result.data.access_token;
@@ -84,9 +89,14 @@ router.post("/gitlab", (req, res) => {
             });
           }
 
-          const { token } = createTokens(user, process.env.JWT_SECRET)
+          const { token, refreshToken } = createTokens(
+            user,
+            process.env.JWT_SECRET,
+            process.env.JWT_SECRET_2
+          );
 
-          res.set("x-token", token)
+          setTokens(res, token, refreshToken);
+
           res.send({
             user
           });
@@ -96,7 +106,7 @@ router.post("/gitlab", (req, res) => {
         });
     })
     .catch(err => {
-      console.error(err)
+      console.error(err);
     });
 });
 
@@ -110,13 +120,15 @@ router.post("/google", (req, res) => {
       client_secret,
       code: req.body.code,
       grant_type: "authorization_code",
-      redirect_uri: redirectUrl('google'),
+      redirect_uri: redirectUrl("google")
     })
     .then(result => {
       const token = result.data.access_token;
 
       axios
-        .get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`)
+        .get(
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`
+        )
         .then(async userRes => {
           let user = await User.findOne({
             socialId: userRes.data.id
@@ -131,9 +143,14 @@ router.post("/google", (req, res) => {
             });
           }
 
-          const { token } = createTokens(user, process.env.JWT_SECRET)
+          const { token, refreshToken } = createTokens(
+            user,
+            process.env.JWT_SECRET,
+            process.env.JWT_SECRET_2
+          );
 
-          res.set("x-token", token)
+          setTokens(res, token, refreshToken);
+
           res.send({
             user
           });
@@ -143,7 +160,7 @@ router.post("/google", (req, res) => {
         });
     })
     .catch(err => {
-      console.error(err)
+      console.error(err);
     });
 });
 
