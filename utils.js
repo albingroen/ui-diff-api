@@ -2,6 +2,13 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
+const cookieConfig = {
+  httpOnly: false, // to disable accessing cookie via client side js
+  //secure: true, // to force https (if you use it)
+  maxAge: 1000000000, // ttl in ms (remove this option and cookie will die when browser is closed)
+  signed: false // if you use the secret with cookieParser
+};
+
 function sendMail(email, subject, text) {
   let transporter = nodemailer.createTransport({
     host: "smtp.sendgrid.net",
@@ -63,14 +70,15 @@ const createTokens = (user, secret1, secret2) => {
 };
 
 const setTokens = (res, token, refreshToken) => {
-  res.set("x-token", token);
-  res.set("x-refresh-token", refreshToken);
+  res.cookie("x-token", token, cookieConfig);
+  res.cookie("x-refresh-token", refreshToken, cookieConfig);
 };
 
 module.exports = {
   sendMail,
   clientUrl,
   getImageUrlWithSize,
+  cookieConfig,
   redirectUrl,
   createTokens,
   setTokens
