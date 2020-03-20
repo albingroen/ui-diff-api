@@ -7,11 +7,12 @@ require("dotenv").config();
 require("./db");
 
 const corsOptions = {
-  exposedHeaders: ["x-token", "x-refresh-token"]
+  exposedHeaders: ["x-token", "x-refresh-token"],
+  credentials: true,
+  origin: 'http://localhost:3000'
 };
 
 app.use(cookieParser())
-app.use(cors(corsOptions));
 app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 app.use(bodyParser.json({ limit: "500mb", extended: true }));
 
@@ -24,6 +25,8 @@ app.use(function(req, res, next) {
   )
   next()
 })
+
+app.use(cors(corsOptions));
 
 // Routes
 app.get("/", (req, res) => {
@@ -39,6 +42,11 @@ app.use("/users", require("./routes/user"));
 app.use("/projects", require("./routes/project"));
 app.use("/teams", require("./routes/team"));
 app.use("/invitations", require("./routes/invitation"));
+
+app.get('/test', (req, res) => {
+  res.cookie('hello', 'world')
+  res.json('cool')
+})
 
 app.get("/download", function(req, res) {
   const { file } = req.query;

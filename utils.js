@@ -6,7 +6,7 @@ const cookieConfig = {
   httpOnly: false, // to disable accessing cookie via client side js
   //secure: true, // to force https (if you use it)
   maxAge: 1000000000, // ttl in ms (remove this option and cookie will die when browser is closed)
-  signed: false // if you use the secret with cookieParser
+  signed: false // if you use the secret with cookieParser,
 };
 
 function sendMail(email, subject, text) {
@@ -61,7 +61,7 @@ const clientUrl = envs[env];
 const redirectUrl = method => `${envs[env]}?method=${method}`;
 
 const createTokens = (user, secret1, secret2) => {
-  const token = jwt.sign({ _id: user._id }, secret1, { expiresIn: "5m" });
+  const token = jwt.sign({ _id: user._id }, secret1, { expiresIn: "5s" });
   const refreshToken = jwt.sign({ _id: user._id }, secret2, {
     expiresIn: "7d"
   });
@@ -74,6 +74,12 @@ const setTokens = (res, token, refreshToken) => {
   res.cookie("x-refresh-token", refreshToken, cookieConfig);
 };
 
+const clearTokens = (res) => {
+  res.clearCookie('x-token')
+  res.clearCookie('x-refresh-token')
+  return true
+}
+
 module.exports = {
   sendMail,
   clientUrl,
@@ -81,5 +87,6 @@ module.exports = {
   cookieConfig,
   redirectUrl,
   createTokens,
-  setTokens
+  setTokens,
+  clearTokens
 };

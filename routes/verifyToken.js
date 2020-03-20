@@ -5,8 +5,8 @@ const secret1 = process.env.JWT_SECRET
 const secret2 = process.env.JWT_SECRET_2
 
 module.exports = function(req, res, next) {
-  const token = req.header("x-token");
-  const refreshToken = req.header("x-refresh-token");
+  const token = req.cookies["x-token"];
+  const refreshToken = req.cookies["x-refresh-token"];
 
   if (!token) return res.status(401).send("Access denied");
 

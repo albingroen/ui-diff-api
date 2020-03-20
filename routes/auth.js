@@ -2,7 +2,12 @@ const router = require("express").Router();
 const queryString = require("query-string");
 const axios = require("axios");
 const User = require("../schemas/user");
-const { redirectUrl, createTokens, setTokens } = require("../utils");
+const {
+  redirectUrl,
+  createTokens,
+  setTokens,
+  clearTokens
+} = require("../utils");
 
 router.post("/github", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
@@ -162,6 +167,11 @@ router.post("/google", (req, res) => {
     .catch(err => {
       console.error(err);
     });
+});
+
+router.post("/logout", (req, res) => {
+  clearTokens(res);
+  res.status(200).send();
 });
 
 module.exports = router;
