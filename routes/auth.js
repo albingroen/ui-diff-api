@@ -6,7 +6,8 @@ const {
   redirectUrl,
   createTokens,
   setTokens,
-  clearTokens
+  clearTokens,
+  cookieConfig
 } = require("../utils");
 
 router.post("/github", (req, res) => {

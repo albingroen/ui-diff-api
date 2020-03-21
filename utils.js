@@ -61,7 +61,7 @@ const clientUrl = envs[env];
 const redirectUrl = method => `${envs[env]}?method=${method}`;
 
 const createTokens = (user, secret1, secret2) => {
-  const token = jwt.sign({ _id: user._id }, secret1, { expiresIn: "5s" });
+  const token = jwt.sign({ _id: user._id }, secret1, { expiresIn: "5m" });
   const refreshToken = jwt.sign({ _id: user._id }, secret2, {
     expiresIn: "7d"
   });
