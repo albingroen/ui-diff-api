@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const bcrypt = require('bcrypt')
 const queryString = require("query-string");
 const axios = require("axios");
 const User = require("../schemas/user");
@@ -6,7 +7,8 @@ const {
   createTokens,
   setTokens,
   clearTokens,
-  getRedirectUrl
+  getRedirectUrl,
+  validatePassword
 } = require("../lib/auth");
 
 router.post("/github", (req, res) => {
@@ -28,7 +30,10 @@ router.post("/github", (req, res) => {
         })
         .then(async userRes => {
           let user = await User.findOne({
-            socialId: userRes.data.id
+            $or: [
+              { email : userRes.data.email },
+              { socialId: userRes.data.id }
+            ]
           });
 
           if (!user) {
@@ -84,7 +89,10 @@ router.post("/gitlab", (req, res) => {
         })
         .then(async userRes => {
           let user = await User.findOne({
-            socialId: userRes.data.id
+            $or: [
+              { email : userRes.data.email },
+              { socialId: userRes.data.id }
+            ]
           });
 
           if (!user) {
@@ -140,7 +148,10 @@ router.post("/google", (req, res) => {
         )
         .then(async userRes => {
           let user = await User.findOne({
-            socialId: userRes.data.id
+            $or: [
+              { email : userRes.data.email },
+              { socialId: userRes.data.id }
+            ]
           });
 
           if (!user) {
@@ -173,6 +184,48 @@ router.post("/google", (req, res) => {
       console.error(err);
       res.status(400).send(err)
     });
+});
+
+router.post("/email/signup", async (req, res, next) => {
+  const { name, email, password } = req.body
+
+  // Return if no credentials
+  if (!(email && password)) {
+    return res.status(400).send({ error: 'missing-credentials' })
+  }
+
+  if (!validatePassword(password)) {
+    return res.status(400).send({ error: 'lacking-password' })
+  }
+
+  // Check for existing user
+  const user = await User.findOne({ email })
+
+  if (user) {
+    res.status(500).send({ error: "email-mismatch" })
+  } else {
+    const salt = await bcrypt.genSalt(10);
+
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword
+    })
+    
+    const { token, refreshToken } = createTokens(
+      newUser,
+      process.env.JWT_SECRET,
+      process.env.JWT_SECRET_2
+    );
+
+    setTokens(res, token, refreshToken);
+
+    res.send({
+      user
+    })
+  }
 });
 
 router.post("/logout", (req, res) => {
