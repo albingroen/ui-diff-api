@@ -54,10 +54,12 @@ router.post("/github", (req, res) => {
         })
         .catch(err => {
           console.error(err);
+          res.status(400).send(err)
         });
     })
     .catch(err => {
       console.error(err);
+      res.status(400).send(err)
     });
 });
 
@@ -108,10 +110,12 @@ router.post("/gitlab", (req, res) => {
         })
         .catch(err => {
           console.error(err);
+          res.status(400).send(err)
         });
     })
     .catch(err => {
       console.error(err);
+      res.status(400).send(err)
     });
 });
 
@@ -162,10 +166,12 @@ router.post("/google", (req, res) => {
         })
         .catch(err => {
           console.error(err);
+          res.status(400).send(err)
         });
     })
     .catch(err => {
       console.error(err);
+      res.status(400).send(err)
     });
 });
 
