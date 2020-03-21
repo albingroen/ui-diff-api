@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { createTokens, setTokens, clearTokens } = require("../utils");
+const { createTokens, setTokens, clearTokens } = require("../lib/auth");
 
 const secret1 = process.env.JWT_SECRET;
 const secret2 = process.env.JWT_SECRET_2;

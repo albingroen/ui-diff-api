@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const uuid = require("uuid/v5");
-const { clientUrl, redirectUrl } = require("../utils");
+const { getRedirectUrl } = require("../lib/auth");
 
 const oauthBaseUrls = {
   github: "https://github.com/login/oauth/authorize",
@@ -26,21 +26,21 @@ router.get("/:method", (req, res) => {
       case "github":
         authUrl =
           oauthBaseUrls.github +
-          `?scope=user&client_id=${client_id}&redirect_uri=${redirectUrl(
+          `?scope=user&client_id=${client_id}&redirect_uri=${getRedirectUrl(
             "github"
           )}&state=${uuid.URL}`;
         break;
       case "gitlab":
         authUrl =
           oauthBaseUrls.gitlab +
-          `?client_id=${client_id}&redirect_uri=${redirectUrl(
+          `?client_id=${client_id}&redirect_uri=${getRedirectUrl(
             "gitlab"
           )}&response_type=code&state=${uuid.URL}&scope=read_user`;
         break;
       case "google":
         authUrl =
           oauthBaseUrls.google +
-          `?scope=profile+email&response_type=code&client_id=${client_id}&redirect_uri=${redirectUrl(
+          `?scope=profile+email&response_type=code&client_id=${client_id}&redirect_uri=${getRedirectUrl(
             "google"
           )}&state=${uuid.URL}`;
         break;

@@ -3,12 +3,11 @@ const queryString = require("query-string");
 const axios = require("axios");
 const User = require("../schemas/user");
 const {
-  redirectUrl,
   createTokens,
   setTokens,
   clearTokens,
-  cookieConfig
-} = require("../utils");
+  getRedirectUrl
+} = require("../lib/auth");
 
 router.post("/github", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
@@ -72,7 +71,7 @@ router.post("/gitlab", (req, res) => {
       client_secret,
       code: req.body.code,
       grant_type: "authorization_code",
-      redirect_uri: redirectUrl("gitlab")
+      redirect_uri: getRedirectUrl("gitlab")
     })
     .then(result => {
       const token = result.data.access_token;
@@ -126,7 +125,7 @@ router.post("/google", (req, res) => {
       client_secret,
       code: req.body.code,
       grant_type: "authorization_code",
-      redirect_uri: redirectUrl("google")
+      redirect_uri: getRedirectUrl("google")
     })
     .then(result => {
       const token = result.data.access_token;
