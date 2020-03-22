@@ -211,7 +211,7 @@ router.post("/email/signup", async (req, res, next) => {
     const newUser = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
     })
     
     const { token, refreshToken } = createTokens(
@@ -225,6 +225,40 @@ router.post("/email/signup", async (req, res, next) => {
     res.send({
       user
     })
+  }
+});
+
+router.post("/email/login", async (req, res, next) => {
+  const { email, password } = req.body
+
+  // Return if no credentials
+  if (!(email && password)) {
+    return res.status(400).send({ error: 'missing-credentials' })
+  }
+
+  // Find user with email
+  const user = await User.findOne({ email })
+
+  if (!user) {
+    return res.status(400).send({ error: 'invalid-credentials' })
+  }
+
+  const passwordsMatch = await bcrypt.compare(password, user.password)
+
+  if (passwordsMatch) {
+    const { token, refreshToken } = createTokens(
+      user,
+      process.env.JWT_SECRET,
+      process.env.JWT_SECRET_2
+    );
+
+    setTokens(res, token, refreshToken);
+
+    res.send({
+      user
+    })
+  } else {
+    return res.status(400).send({ error: 'invalid-credentials' })
   }
 });
 
