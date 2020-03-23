@@ -12,6 +12,7 @@ const {
 } = require("../lib/auth");
 const { clientUrl } = require('../lib/env')
 const { sendMail } = require('../lib/mail')
+const emailConfirmation = require('../lib/email-templates/email-confirmation')
 
 router.post("/github", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
@@ -220,7 +221,7 @@ router.post("/email/signup", async (req, res, next) => {
     sendMail(
       newUser.email,
       'Confirm email on ui-diff',
-      `Welcome to ui-diff! Click the link to confirm your email: ${clientUrl}/confirmation/${newUser._id}`
+      emailConfirmation(`${clientUrl}/confirmation/${newUser._id}`)
     )
 
     res.status(200).send("Success")
