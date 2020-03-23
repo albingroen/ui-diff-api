@@ -8,7 +8,8 @@ const userSchema = new Schema(
     email: { type: String, required: false },
     avatar: { type: String, required: false },
     socialId: { type: String, required: false },
-    password: { type: String, required: false }
+    password: { type: String, required: false },
+    confirmed: { type: Boolean, required: false, default: true }
   },
   { timestamps: true, strict: true }
 );

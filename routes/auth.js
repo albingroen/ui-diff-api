@@ -10,6 +10,8 @@ const {
   getRedirectUrl,
   validatePassword
 } = require("../lib/auth");
+const { clientUrl } = require('../lib/env')
+const { sendMail } = require('../lib/mail')
 
 router.post("/github", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
@@ -212,19 +214,16 @@ router.post("/email/signup", async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
+      confirmed: false
     })
-    
-    const { token, refreshToken } = createTokens(
-      newUser,
-      process.env.JWT_SECRET,
-      process.env.JWT_SECRET_2
-    );
 
-    setTokens(res, token, refreshToken);
+    sendMail(
+      newUser.email,
+      'Confirm email on ui-diff',
+      `Welcome to ui-diff! Click the link to confirm your email: ${clientUrl}/confirmation/${newUser._id}`
+    )
 
-    res.send({
-      user
-    })
+    res.status(200).send()
   }
 });
 
@@ -246,17 +245,21 @@ router.post("/email/login", async (req, res, next) => {
   const passwordsMatch = await bcrypt.compare(password, user.password)
 
   if (passwordsMatch) {
-    const { token, refreshToken } = createTokens(
-      user,
-      process.env.JWT_SECRET,
-      process.env.JWT_SECRET_2
-    );
+    if (user.confirmed) {
+      const { token, refreshToken } = createTokens(
+        user,
+        process.env.JWT_SECRET,
+        process.env.JWT_SECRET_2
+      );
 
-    setTokens(res, token, refreshToken);
+      setTokens(res, token, refreshToken);
 
-    res.send({
-      user
-    })
+      res.send({
+        user
+      })
+    } else {
+      res.status(400).send({ error: 'email-not-confirmed' })
+    }
   } else {
     return res.status(400).send({ error: 'invalid-credentials' })
   }
