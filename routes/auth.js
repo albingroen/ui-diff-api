@@ -223,7 +223,7 @@ router.post("/email/signup", async (req, res, next) => {
       `Welcome to ui-diff! Click the link to confirm your email: ${clientUrl}/confirmation/${newUser._id}`
     )
 
-    res.status(200).send()
+    res.status(200).send("Success")
   }
 });
 
