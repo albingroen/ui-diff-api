@@ -3,6 +3,8 @@ const verify = require("./verifyToken");
 const User = require("../schemas/user");
 const Team = require("../schemas/team");
 const { createTokens, setTokens } = require('../lib/auth')
+const { sendMail } = require('../lib/mail')
+const welcome = require('../lib/email-templates/welcome')
 
 // Get user
 router.get("/", verify, async (req, res) => {
@@ -39,6 +41,12 @@ router.post('/:id/confirm', async (req, res) => {
     );
 
     setTokens(res, token, refreshToken);
+
+    sendMail(
+      updatedUser.email,
+      'Welcome to ui-diff!',
+      welcome(updatedUser.name)
+    )
 
     res.send({
       user: updatedUser
