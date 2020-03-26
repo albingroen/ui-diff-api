@@ -1,8 +1,10 @@
 const router = require("express").Router();
+const moment = require('moment')
 const bcrypt = require('bcrypt')
 const queryString = require("query-string");
 const axios = require("axios");
 const User = require("../schemas/user");
+const PasswordReset = require("../schemas/password-reset");
 const {
   createTokens,
   setTokens,
@@ -13,6 +15,7 @@ const {
 const { clientUrl } = require('../lib/env')
 const { sendMail } = require('../lib/mail')
 const emailConfirmation = require('../lib/email-templates/email-confirmation')
+const passwordReset = require('../lib/email-templates/password-reset')
 
 router.post("/github", (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
@@ -257,6 +260,83 @@ router.post("/email/login", async (req, res, next) => {
 
       res.send({
         user
+      })
+    } else {
+      res.status(400).send({ error: 'email-not-confirmed' })
+    }
+  } else {
+    return res.status(400).send({ error: 'invalid-credentials' })
+  }
+});
+
+router.post("/email/reset/create", async (req, res, next) => {
+  const { email } = req.body
+
+  const user = await User.findOne({ email })
+
+  if (!user) {
+    return res.status(200).send()
+  }
+
+  const pr = await PasswordReset.create(
+    { _user: user._id, validThru: moment().add('1', 'hour') }
+  )
+
+  const url = clientUrl + '/reset-password/' + pr._id
+
+  sendMail(
+    user.email,
+    'Reset your password',
+    passwordReset(url)
+  )
+
+  res.status(200).send()
+});
+
+router.post("/email/reset/confirm", async (req, res, next) => {
+  const { newPassword, confirmedPassword, passwordResetId } = req.body
+
+  // Find user with email
+  const pr = await PasswordReset.findOne({ _id: passwordResetId })
+  const user = await User.findOne({ _id: pr._user })
+
+  // Return if no credentials
+  if (!(newPassword && confirmedPassword)) {
+    return res.status(400).send({ error: 'missing-credentials' })
+  } else if (!pr) {
+    return res.status(400).send({ error: 'unvailable' })
+  } else if (new Date() > new Date(pr.validThru)) {
+    return res.status(400).send({ error: 'reset-password-link-expired' })
+  } else if (!user) {
+    return res.status(400).send({ error: 'network' })
+  }
+
+  const passwordsMatch = newPassword === confirmedPassword
+
+  if (passwordsMatch) {
+    if (user.confirmed) {
+      const salt = await bcrypt.genSalt(10);
+
+      const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+
+      const updatedUser = await User.updateOne(
+        { _id: user._id },
+        { password: hashedNewPassword },
+        { new: true }
+      )
+
+      await PasswordReset.updateOne({ _id: pr._id }, { validThru: new Date() })
+
+      const { token, refreshToken } = createTokens(
+        updatedUser,
+        process.env.JWT_SECRET,
+        process.env.JWT_SECRET_2
+      );
+
+      setTokens(res, token, refreshToken);
+
+      res.send({
+        user: updatedUser
       })
     } else {
       res.status(400).send({ error: 'email-not-confirmed' })
