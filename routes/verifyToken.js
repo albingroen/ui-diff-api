@@ -16,7 +16,7 @@ module.exports = function(req, res, next) {
     next();
   } catch {
     if (!refreshToken) {
-      res.status(400).send("Invalid token");
+      return res.status(400).send("Invalid token");
     } else {
       try {
         const verified2 = jwt.verify(refreshToken, secret2);
@@ -26,7 +26,7 @@ module.exports = function(req, res, next) {
         next();
       } catch {
         clearTokens(res);
-        res.status(400).send("Expired token");
+        return res.status(400).send("Expired token");
       }
     }
   }
