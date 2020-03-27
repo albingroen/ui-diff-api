@@ -10,7 +10,8 @@ const {
   setTokens,
   clearTokens,
   getRedirectUrl,
-  validatePassword
+  validatePassword,
+  passwordResetIsValid
 } = require("../lib/auth");
 const { clientUrl } = require('../lib/env')
 const { sendMail } = require('../lib/mail')
@@ -345,6 +346,24 @@ router.post("/email/reset/confirm", async (req, res, next) => {
     return res.status(400).send({ error: 'invalid-credentials' })
   }
 });
+
+router.get('/email/reset/:id', async (req, res) => {
+  const { id } = req.params
+
+  if (!id) {
+    return res.status(400).send({ error: 'network' })
+  }
+
+  const passwordReset = await PasswordReset.findOne({ _id: id })
+
+  if (!passwordResetIsValid(passwordReset)) {
+    return res.status(400).send({ error: 'link-expired' })
+  }
+
+  res.send({
+    passwordReset
+  })
+})
 
 router.post("/logout", (req, res) => {
   clearTokens(res);
