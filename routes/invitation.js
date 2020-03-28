@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const verify = require("./verifyToken");
 const Invitation = require("../schemas/invitation");
-const { sendMail } = require("../utils");
+const { sendMail } = require("../lib/mail");
 const Team = require("../schemas/team");
 
 // Create a invitation

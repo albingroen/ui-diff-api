@@ -1,21 +1,58 @@
 const router = require("express").Router();
 const uuid = require("uuid/v5");
-const { clientUrl } = require("../utils");
+const { getRedirectUrl } = require("../lib/auth");
 
-// Github login retrieval
-router.get("/", (req, res) => {
-  const { invitation } = req.query;
-  const client_id = process.env.GITHUB_CLIENT_ID;
+const oauthBaseUrls = {
+  github: "https://github.com/login/oauth/authorize",
+  gitlab: "https://gitlab.com/oauth/authorize",
+  google: "https://accounts.google.com/o/oauth2/v2/auth"
+};
 
-  if (!invitation || invitation === "undefined") {
-    res.json({
-      url: `https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${clientUrl}/login&state=${uuid.URL}`
-    });
-  } else {
-    res.json({
-      url: `https://github.com/login/oauth/authorize?scope=user&client_id=${client_id}&redirect_uri=${clientUrl}/login?invitation=${invitation}&state=${uuid.URL}`
-    });
+const clientIds = {
+  github: process.env.GITHUB_CLIENT_ID,
+  gitlab: process.env.GITLAB_CLIENT_ID,
+  google: process.env.GOOGLE_CLIENT_ID
+};
+
+router.get("/:method", (req, res) => {
+  const { method } = req.params;
+
+  const client_id = clientIds[method];
+
+  let authUrl;
+
+  if (client_id) {
+    switch (method) {
+      case "github":
+        authUrl =
+          oauthBaseUrls.github +
+          `?scope=user&client_id=${client_id}&redirect_uri=${getRedirectUrl(
+            "github"
+          )}&state=${uuid.URL}`;
+        break;
+      case "gitlab":
+        authUrl =
+          oauthBaseUrls.gitlab +
+          `?client_id=${client_id}&redirect_uri=${getRedirectUrl(
+            "gitlab"
+          )}&response_type=code&state=${uuid.URL}&scope=read_user`;
+        break;
+      case "google":
+        authUrl =
+          oauthBaseUrls.google +
+          `?scope=profile+email&response_type=code&client_id=${client_id}&redirect_uri=${getRedirectUrl(
+            "google"
+          )}&state=${uuid.URL}`;
+        break;
+
+      default:
+        break;
+    }
   }
+
+  res.json({
+    url: authUrl
+  });
 });
 
 module.exports = router;

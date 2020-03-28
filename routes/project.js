@@ -6,7 +6,7 @@ const verify = require("./verifyToken");
 const Project = require("../schemas/project");
 const User = require("../schemas/user");
 const Team = require("../schemas/team");
-const { getImageUrlWithSize } = require("../utils");
+const { getImageUrlWithSize } = require("../lib/image");
 
 deepai.setApiKey(process.env.DEEP_AI_API_KEY);
 

@@ -1,13 +1,39 @@
 const app = require("express")();
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
 require("./db");
 
-app.use(cors());
+const whitelist = ["http://localhost:3000", "https://app.ui-diff.com"];
+
+const corsOptions = {
+  credentials: true,
+  origin: (origin, callback) => {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+};
+
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true, limit: "500mb" }));
 app.use(bodyParser.json({ limit: "500mb", extended: true }));
+
+app.use(function(req, res, next) {
+  res.header("Content-Type", "application/json;charset=UTF-8");
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
+
+app.use(cors(corsOptions));
 
 // Routes
 app.get("/", (req, res) => {
@@ -23,6 +49,11 @@ app.use("/users", require("./routes/user"));
 app.use("/projects", require("./routes/project"));
 app.use("/teams", require("./routes/team"));
 app.use("/invitations", require("./routes/invitation"));
+
+app.get("/test", (req, res) => {
+  res.cookie("hello", "world");
+  res.json("cool");
+});
 
 app.get("/download", function(req, res) {
   const { file } = req.query;
