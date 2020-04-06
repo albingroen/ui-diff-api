@@ -13,11 +13,13 @@ deepai.setApiKey(process.env.DEEP_AI_API_KEY);
 // Create a project
 router.post("/", verify, async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
-  const { name, team } = req.body;
+  const { name, team: teamId } = req.body;
+
+  const team = await Team.findOne({ _id: teamId })
 
   const project = await Project.create({
     name,
-    _team: team,
+    _team: team || undefined,
     _createdBy: user._id,
     apiKey: uuidAPIKey.create().apiKey
   });
