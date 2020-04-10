@@ -18,12 +18,14 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "md5": "^2.2.1",
     "minimist": "^1.2.5",
     "moment": "^2.24.0",
     "mongoose": "^5.8.1",
     "nodemailer": "^6.4.2",
     "nodemon": "^2.0.2",
     "query-string": "^6.9.0",
+    "stripe": "^8.39.1",
     "uuid": "^3.3.3",
     "uuid-apikey": "^1.4.6"
   }

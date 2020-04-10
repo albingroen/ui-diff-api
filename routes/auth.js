@@ -15,6 +15,7 @@ const {
 } = require("../lib/auth");
 const { clientUrl } = require('../lib/env')
 const { sendMail } = require('../lib/mail')
+const { getAvatarFromEmail } = require('../lib/user')
 const emailConfirmation = require('../lib/email-templates/email-confirmation')
 const passwordReset = require('../lib/email-templates/password-reset')
 
@@ -219,7 +220,8 @@ router.post("/email/signup", async (req, res, next) => {
       name,
       email,
       password: hashedPassword,
-      confirmed: false
+      confirmed: false,
+      avatar: getAvatarFromEmail(email)
     })
 
     sendMail(

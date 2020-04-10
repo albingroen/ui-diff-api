@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const verify = require("./verifyToken");
 const Team = require("../schemas/team");
+const Project = require("../schemas/project");
 const Invitation = require("../schemas/invitation");
 
 // Create a team
@@ -21,6 +22,23 @@ router.post("/", verify, async (req, res) => {
   res.json({
     team
   });
+});
+
+// Get team projects
+router.get("/:id/projects", verify, async (req, res) => {
+  const { id } = req.params;
+  const { user } = req
+
+  const team = await Team.findOne({
+    _id: id,
+    "members._user": { $in: user._id }
+  })
+
+  const projects = await Project.find({ _team: team._id })
+
+  res.json({
+    projects
+  })
 });
 
 // Get a specific team

@@ -49,6 +49,7 @@ app.use("/users", require("./routes/user"));
 app.use("/projects", require("./routes/project"));
 app.use("/teams", require("./routes/team"));
 app.use("/invitations", require("./routes/invitation"));
+app.use("/billing", require("./routes/billing"));
 
 app.get("/test", (req, res) => {
   res.cookie("hello", "world");
