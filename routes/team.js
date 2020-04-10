@@ -16,7 +16,8 @@ router.post("/", verify, async (req, res) => {
         _user: req.user._id
       }
     ],
-    _createdBy: req.user._id
+    _createdBy: req.user._id,
+    logo: `https://eu.ui-avatars.com/api/?name=${name}`
   });
 
   res.json({
