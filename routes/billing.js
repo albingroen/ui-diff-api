@@ -1,40 +1,39 @@
 const router = require("express").Router();
 const verify = require("./verifyToken");
-const { stripe } = require("../lib/billing")
+const { 
+  stripe,
+  getProductPlans,
+  getCustomerSubscriptions,
+  createSubcription
+} = require("../lib/billing")
 
 
-// Create a team
+// Get all product plans
 router.get("/plans", async (req, res) => {
-  const plans = await stripe.plans.list()
+  const plans = await getProductPlans()
 
   res.json({
     plans
   })
 });
 
-// Get subscriptions
+// Get customer subscriptions
 router.get("/:customerId/subscriptions", async (req, res) => {
   const { customerId } = req.params
 
-  const subscriptions = await stripe.subscriptions.list({ customer: customerId })
+  const subscriptions = await getCustomerSubscriptions(customerId)
 
   res.json({
     subscriptions
   })
 });
 
-// Create subscription
+// Create a subscription
 router.post("/subscriptions", async (req, res) => {
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: 1000,
-    currency: 'sek',
-    payment_method_types: ['card'],
-    receipt_email: 'jenny.rosen@example.com',
-
-  });
+  const subscription = await createSubcription(req.body)
 
   res.json({
-    paymentIntent
+    subscription
   })
 });
 
