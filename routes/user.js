@@ -10,7 +10,9 @@ const welcome = require('../lib/email-templates/welcome');
 // Get user
 router.get('/', verify, async (req, res) => {
   const user = await User.findOne({ _id: req.user._id });
-  const teams = await Team.find({ 'members._user': { $in: user._id } }).populate('members._user');
+  const teams = await Team.find({
+    'members._user': { $in: user._id },
+  }).populate('members._user');
 
   res.json({
     user: {
@@ -33,7 +35,9 @@ router.post('/:id/confirm', async (req, res) => {
   } else {
     // Confirm user
     const updatedUser = await User.findOneAndUpdate(
-      { _id: user._id }, { confirmed: true }, { new: true },
+      { _id: user._id },
+      { confirmed: true },
+      { new: true },
     );
 
     // Create user

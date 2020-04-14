@@ -51,8 +51,9 @@ router.get('/:id', verify, async (req, res) => {
 
   const teamWithUserRole = {
     ...team.toObject(),
-    role: team.members.find((member) => String(member._user._id) === req.user._id)
-      .role,
+    role: team.members.find(
+      (member) => String(member._user._id) === req.user._id,
+    ).role,
   };
 
   res.json({

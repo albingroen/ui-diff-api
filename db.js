@@ -7,10 +7,7 @@ const {
 
 const mongoUrl = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
 
-mongoose.connect(
-  mongoUrl,
-  { useNewUrlParser: true, useFindAndModify: false },
-);
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useFindAndModify: false });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));

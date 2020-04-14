@@ -38,10 +38,7 @@ router.post('/github', (req, res) => {
         })
         .then(async (userRes) => {
           let user = await User.findOne({
-            $or: [
-              { email: userRes.data.email },
-              { socialId: userRes.data.id },
-            ],
+            $or: [{ email: userRes.data.email }, { socialId: userRes.data.id }],
           });
 
           if (!user) {
@@ -95,10 +92,7 @@ router.post('/gitlab', (req, res) => {
         })
         .then(async (userRes) => {
           let user = await User.findOne({
-            $or: [
-              { email: userRes.data.email },
-              { socialId: userRes.data.id },
-            ],
+            $or: [{ email: userRes.data.email }, { socialId: userRes.data.id }],
           });
 
           if (!user) {
@@ -152,10 +146,7 @@ router.post('/google', (req, res) => {
         )
         .then(async (userRes) => {
           let user = await User.findOne({
-            $or: [
-              { email: userRes.data.email },
-              { socialId: userRes.data.id },
-            ],
+            $or: [{ email: userRes.data.email }, { socialId: userRes.data.id }],
           });
 
           if (!user) {
@@ -275,17 +266,14 @@ router.post('/email/reset/create', async (req, res) => {
     return res.status(200).send();
   }
 
-  const pr = await PasswordReset.create(
-    { _user: user._id, validThru: moment().add('1', 'hour') },
-  );
+  const pr = await PasswordReset.create({
+    _user: user._id,
+    validThru: moment().add('1', 'hour'),
+  });
 
   const url = `${clientUrl}/reset-password/${pr._id}`;
 
-  sendMail(
-    user.email,
-    'Reset your password',
-    passwordReset(url),
-  );
+  sendMail(user.email, 'Reset your password', passwordReset(url));
 
   res.status(200).send();
 });
@@ -300,11 +288,14 @@ router.post('/email/reset/confirm', async (req, res) => {
   // Return if no credentials
   if (!(newPassword && confirmedPassword)) {
     return res.status(400).send({ error: 'missing-credentials' });
-  } if (!pr) {
+  }
+  if (!pr) {
     return res.status(400).send({ error: 'unvailable' });
-  } if (new Date() > new Date(pr.validThru)) {
+  }
+  if (new Date() > new Date(pr.validThru)) {
     return res.status(400).send({ error: 'reset-password-link-expired' });
-  } if (!user) {
+  }
+  if (!user) {
     return res.status(400).send({ error: 'network' });
   }
 

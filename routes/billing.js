@@ -1,7 +1,10 @@
 const router = require('express').Router();
 const verify = require('./verifyToken');
-const { getProductPlans, getCustomerSubscriptions, connectCustomerPaymentMethod } = require('../lib/billing');
-
+const {
+  getProductPlans,
+  getCustomerSubscriptions,
+  connectCustomerPaymentMethod,
+} = require('../lib/billing');
 
 // Get all product plans
 router.get('/plans', async (req, res) => {
@@ -28,7 +31,8 @@ router.post('/:customerId/payment-methods', verify, async (req, res) => {
   const { customerId } = req.params;
 
   const paymentMethod = await connectCustomerPaymentMethod({
-    customerId, methodId: req.body.paymentMethod,
+    customerId,
+    methodId: req.body.paymentMethod,
   });
 
   res.json({
