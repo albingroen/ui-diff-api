@@ -4,7 +4,8 @@ const {
   stripe,
   getProductPlans,
   getCustomerSubscriptions,
-  createSubcription
+  createCustomerSubscription,
+  connectCustomerPaymentMethod
 } = require("../lib/billing")
 
 
@@ -28,13 +29,17 @@ router.get("/:customerId/subscriptions", async (req, res) => {
   })
 });
 
-// Create a subscription
-router.post("/subscriptions", async (req, res) => {
-  const subscription = await createSubcription(req.body)
+// Create customer payment method
+router.post("/:customerId/payment-methods", async (req, res) => {
+  const { customerId } = req.params
+
+  const paymentMethod = await connectCustomerPaymentMethod({ 
+    customerId, methodId: req.body.paymentMethod
+  })
 
   res.json({
-    subscription
+    paymentMethod
   })
-});
+})
 
 module.exports = router;
