@@ -1,47 +1,47 @@
-const router = require("express").Router();
-const moment = require('moment')
-const bcrypt = require('bcrypt')
-const queryString = require("query-string");
-const axios = require("axios");
-const User = require("../schemas/user");
-const PasswordReset = require("../schemas/password-reset");
+const router = require('express').Router();
+const moment = require('moment');
+const bcrypt = require('bcrypt');
+const queryString = require('query-string');
+const axios = require('axios');
+const User = require('../schemas/user');
+const PasswordReset = require('../schemas/password-reset');
 const {
   createTokens,
   setTokens,
   clearTokens,
   getRedirectUrl,
   validatePassword,
-  passwordResetIsValid
-} = require("../lib/auth");
-const { clientUrl } = require('../lib/env')
-const { sendMail } = require('../lib/mail')
-const { getAvatarFromEmail } = require('../lib/user')
-const emailConfirmation = require('../lib/email-templates/email-confirmation')
-const passwordReset = require('../lib/email-templates/password-reset')
+  passwordResetIsValid,
+} = require('../lib/auth');
+const { clientUrl } = require('../lib/env');
+const { sendMail } = require('../lib/mail');
+const { getAvatarFromEmail } = require('../lib/user');
+const emailConfirmation = require('../lib/email-templates/email-confirmation');
+const passwordReset = require('../lib/email-templates/password-reset');
 
-router.post("/github", (req, res) => {
+router.post('/github', (req, res) => {
   const client_id = process.env.GITHUB_CLIENT_ID;
   const client_secret = process.env.GITHUB_CLIENT_SECRET;
 
   axios
-    .post("https://github.com/login/oauth/access_token", {
+    .post('https://github.com/login/oauth/access_token', {
       client_id,
       client_secret,
-      code: req.body.code
+      code: req.body.code,
     })
-    .then(result => {
+    .then((result) => {
       const token = queryString.parse(result.data).access_token;
 
       axios
-        .get("https://api.github.com/user", {
-          headers: { Authorization: `token ${token}` }
+        .get('https://api.github.com/user', {
+          headers: { Authorization: `token ${token}` },
         })
-        .then(async userRes => {
+        .then(async (userRes) => {
           let user = await User.findOne({
             $or: [
-              { email : userRes.data.email },
-              { socialId: userRes.data.id }
-            ]
+              { email: userRes.data.email },
+              { socialId: userRes.data.id },
+            ],
           });
 
           if (!user) {
@@ -49,58 +49,56 @@ router.post("/github", (req, res) => {
               name: userRes.data.name || userRes.data.login,
               email: userRes.data.email,
               avatar: userRes.data.avatar_url,
-              socialId: userRes.data.id
+              socialId: userRes.data.id,
             });
           }
 
-          const { token, refreshToken } = createTokens(
+          const { token: authToken, refreshToken } = createTokens(
             user,
             process.env.JWT_SECRET,
-            process.env.JWT_SECRET_2
+            process.env.JWT_SECRET_2,
           );
 
-          setTokens(res, token, refreshToken);
+          setTokens(res, authToken, refreshToken);
 
           res.send({
-            user
+            user,
           });
         })
-        .catch(err => {
-          console.error(err);
-          res.status(400).send(err)
+        .catch((err) => {
+          res.status(400).send(err);
         });
     })
-    .catch(err => {
-      console.error(err);
-      res.status(400).send(err)
+    .catch((err) => {
+      res.status(400).send(err);
     });
 });
 
-router.post("/gitlab", (req, res) => {
+router.post('/gitlab', (req, res) => {
   const client_id = process.env.GITLAB_CLIENT_ID;
   const client_secret = process.env.GITLAB_CLIENT_SECRET;
 
   axios
-    .post("https://gitlab.com/oauth/token", {
+    .post('https://gitlab.com/oauth/token', {
       client_id,
       client_secret,
       code: req.body.code,
-      grant_type: "authorization_code",
-      redirect_uri: getRedirectUrl("gitlab")
+      grant_type: 'authorization_code',
+      redirect_uri: getRedirectUrl('gitlab'),
     })
-    .then(result => {
+    .then((result) => {
       const token = result.data.access_token;
 
       axios
-        .get("https://gitlab.com/api/v3/user", {
-          headers: { Authorization: `Bearer ${token}` }
+        .get('https://gitlab.com/api/v3/user', {
+          headers: { Authorization: `Bearer ${token}` },
         })
-        .then(async userRes => {
+        .then(async (userRes) => {
           let user = await User.findOne({
             $or: [
-              { email : userRes.data.email },
-              { socialId: userRes.data.id }
-            ]
+              { email: userRes.data.email },
+              { socialId: userRes.data.id },
+            ],
           });
 
           if (!user) {
@@ -108,58 +106,56 @@ router.post("/gitlab", (req, res) => {
               name: userRes.data.name || userRes.data.login,
               email: userRes.data.email,
               avatar: userRes.data.avatar_url,
-              socialId: userRes.data.id
+              socialId: userRes.data.id,
             });
           }
 
-          const { token, refreshToken } = createTokens(
+          const { token: authToken, refreshToken } = createTokens(
             user,
             process.env.JWT_SECRET,
-            process.env.JWT_SECRET_2
+            process.env.JWT_SECRET_2,
           );
 
-          setTokens(res, token, refreshToken);
+          setTokens(res, authToken, refreshToken);
 
           res.send({
-            user
+            user,
           });
         })
-        .catch(err => {
-          console.error(err);
-          res.status(400).send(err)
+        .catch((err) => {
+          res.status(400).send(err);
         });
     })
-    .catch(err => {
-      console.error(err);
-      res.status(400).send(err)
+    .catch((err) => {
+      res.status(400).send(err);
     });
 });
 
-router.post("/google", (req, res) => {
+router.post('/google', (req, res) => {
   const client_id = process.env.GOOGLE_CLIENT_ID;
   const client_secret = process.env.GOOGLE_CLIENT_SECRET;
 
   axios
-    .post("https://oauth2.googleapis.com/token", {
+    .post('https://oauth2.googleapis.com/token', {
       client_id,
       client_secret,
       code: req.body.code,
-      grant_type: "authorization_code",
-      redirect_uri: getRedirectUrl("google")
+      grant_type: 'authorization_code',
+      redirect_uri: getRedirectUrl('google'),
     })
-    .then(result => {
+    .then((result) => {
       const token = result.data.access_token;
 
       axios
         .get(
-          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`
+          `https://www.googleapis.com/oauth2/v1/userinfo?access_token=${token}`,
         )
-        .then(async userRes => {
+        .then(async (userRes) => {
           let user = await User.findOne({
             $or: [
-              { email : userRes.data.email },
-              { socialId: userRes.data.id }
-            ]
+              { email: userRes.data.email },
+              { socialId: userRes.data.id },
+            ],
           });
 
           if (!user) {
@@ -167,50 +163,48 @@ router.post("/google", (req, res) => {
               name: userRes.data.name || userRes.data.login,
               email: userRes.data.email,
               avatar: userRes.data.picture,
-              socialId: userRes.data.id
+              socialId: userRes.data.id,
             });
           }
 
-          const { token, refreshToken } = createTokens(
+          const { token: authToken, refreshToken } = createTokens(
             user,
             process.env.JWT_SECRET,
-            process.env.JWT_SECRET_2
+            process.env.JWT_SECRET_2,
           );
 
-          setTokens(res, token, refreshToken);
+          setTokens(res, authToken, refreshToken);
 
           res.send({
-            user
+            user,
           });
         })
-        .catch(err => {
-          console.error(err);
-          res.status(400).send(err)
+        .catch((err) => {
+          res.status(400).send(err);
         });
     })
-    .catch(err => {
-      console.error(err);
-      res.status(400).send(err)
+    .catch((err) => {
+      res.status(400).send(err);
     });
 });
 
-router.post("/email/signup", async (req, res, next) => {
-  const { name, email, password } = req.body
+router.post('/email/signup', async (req, res) => {
+  const { name, email, password } = req.body;
 
   // Return if no credentials
   if (!(email && password)) {
-    return res.status(400).send({ error: 'missing-credentials' })
+    return res.status(400).send({ error: 'missing-credentials' });
   }
 
   if (!validatePassword(password)) {
-    return res.status(400).send({ error: 'lacking-password' })
+    return res.status(400).send({ error: 'lacking-password' });
   }
 
   // Check for existing user
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ email });
 
   if (user) {
-    res.status(500).send({ error: "email-mismatch" })
+    res.status(500).send({ error: 'email-mismatch' });
   } else {
     const salt = await bcrypt.genSalt(10);
 
@@ -221,100 +215,100 @@ router.post("/email/signup", async (req, res, next) => {
       email,
       password: hashedPassword,
       confirmed: false,
-      avatar: getAvatarFromEmail(email)
-    })
+      avatar: getAvatarFromEmail(email),
+    });
 
     sendMail(
       newUser.email,
       'Confirm email on ui-diff',
-      emailConfirmation(`${clientUrl}/confirmation/${newUser._id}`)
-    )
+      emailConfirmation(`${clientUrl}/confirmation/${newUser._id}`),
+    );
 
-    res.status(200).send("Success")
+    res.status(200).send('Success');
   }
 });
 
-router.post("/email/login", async (req, res, next) => {
-  const { email, password } = req.body
+router.post('/email/login', async (req, res) => {
+  const { email, password } = req.body;
 
   // Return if no credentials
   if (!(email && password)) {
-    return res.status(400).send({ error: 'missing-credentials' })
+    return res.status(400).send({ error: 'missing-credentials' });
   }
 
   // Find user with email
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(400).send({ error: 'invalid-credentials' })
+    return res.status(400).send({ error: 'invalid-credentials' });
   }
 
-  const passwordsMatch = await bcrypt.compare(password, user.password)
+  const passwordsMatch = await bcrypt.compare(password, user.password);
 
   if (passwordsMatch) {
     if (user.confirmed) {
       const { token, refreshToken } = createTokens(
         user,
         process.env.JWT_SECRET,
-        process.env.JWT_SECRET_2
+        process.env.JWT_SECRET_2,
       );
 
       setTokens(res, token, refreshToken);
 
       res.send({
-        user
-      })
+        user,
+      });
     } else {
-      res.status(400).send({ error: 'email-not-confirmed' })
+      res.status(400).send({ error: 'email-not-confirmed' });
     }
   } else {
-    return res.status(400).send({ error: 'invalid-credentials' })
+    return res.status(400).send({ error: 'invalid-credentials' });
   }
 });
 
-router.post("/email/reset/create", async (req, res, next) => {
-  const { email } = req.body
+router.post('/email/reset/create', async (req, res) => {
+  const { email } = req.body;
 
-  const user = await User.findOne({ email })
+  const user = await User.findOne({ email });
 
   if (!user) {
-    return res.status(200).send()
+    return res.status(200).send();
   }
 
   const pr = await PasswordReset.create(
-    { _user: user._id, validThru: moment().add('1', 'hour') }
-  )
+    { _user: user._id, validThru: moment().add('1', 'hour') },
+  );
 
-  const url = clientUrl + '/reset-password/' + pr._id
+  const url = `${clientUrl}/reset-password/${pr._id}`;
 
   sendMail(
     user.email,
     'Reset your password',
-    passwordReset(url)
-  )
+    passwordReset(url),
+  );
 
-  res.status(200).send()
+  res.status(200).send();
 });
 
-router.post("/email/reset/confirm", async (req, res, next) => {
-  const { newPassword, confirmedPassword, passwordResetId } = req.body
+router.post('/email/reset/confirm', async (req, res) => {
+  const { newPassword, confirmedPassword, passwordResetId } = req.body;
 
   // Find user with email
-  const pr = await PasswordReset.findOne({ _id: passwordResetId })
-  const user = await User.findOne({ _id: pr._user })
+  const pr = await PasswordReset.findOne({ _id: passwordResetId });
+  const user = await User.findOne({ _id: pr._user });
 
   // Return if no credentials
   if (!(newPassword && confirmedPassword)) {
-    return res.status(400).send({ error: 'missing-credentials' })
-  } else if (!pr) {
-    return res.status(400).send({ error: 'unvailable' })
-  } else if (new Date() > new Date(pr.validThru)) {
-    return res.status(400).send({ error: 'reset-password-link-expired' })
-  } else if (!user) {
-    return res.status(400).send({ error: 'network' })
+    return res.status(400).send({ error: 'missing-credentials' });
+  } if (!pr) {
+    return res.status(400).send({ error: 'unvailable' });
+  } if (new Date() > new Date(pr.validThru)) {
+    return res.status(400).send({ error: 'reset-password-link-expired' });
+  } if (!user) {
+    return res.status(400).send({ error: 'network' });
   }
 
-  const passwordsMatch = newPassword === confirmedPassword
+  const passwordsMatch = newPassword === confirmedPassword;
 
   if (passwordsMatch) {
     if (user.confirmed) {
@@ -325,49 +319,49 @@ router.post("/email/reset/confirm", async (req, res, next) => {
       const updatedUser = await User.updateOne(
         { _id: user._id },
         { password: hashedNewPassword },
-        { new: true }
-      )
+        { new: true },
+      );
 
-      await PasswordReset.updateOne({ _id: pr._id }, { validThru: new Date() })
+      await PasswordReset.updateOne({ _id: pr._id }, { validThru: new Date() });
 
       const { token, refreshToken } = createTokens(
         updatedUser,
         process.env.JWT_SECRET,
-        process.env.JWT_SECRET_2
+        process.env.JWT_SECRET_2,
       );
 
       setTokens(res, token, refreshToken);
 
       res.send({
-        user: updatedUser
-      })
+        user: updatedUser,
+      });
     } else {
-      res.status(400).send({ error: 'email-not-confirmed' })
+      res.status(400).send({ error: 'email-not-confirmed' });
     }
   } else {
-    return res.status(400).send({ error: 'invalid-credentials' })
+    return res.status(400).send({ error: 'invalid-credentials' });
   }
 });
 
 router.get('/email/reset/:id', async (req, res) => {
-  const { id } = req.params
+  const { id } = req.params;
 
   if (!id) {
-    return res.status(400).send({ error: 'network' })
+    return res.status(400).send({ error: 'network' });
   }
 
-  const passwordReset = await PasswordReset.findOne({ _id: id })
+  const pr = await PasswordReset.findOne({ _id: id });
 
-  if (!passwordResetIsValid(passwordReset)) {
-    return res.status(400).send({ error: 'link-expired' })
+  if (!passwordResetIsValid(pr)) {
+    return res.status(400).send({ error: 'link-expired' });
   }
 
   res.send({
-    passwordReset
-  })
-})
+    pr,
+  });
+});
 
-router.post("/logout", (req, res) => {
+router.post('/logout', (req, res) => {
   clearTokens(res);
   res.status(200).send();
 });

@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
 
 const { ObjectId } = Schema.Types;
 
@@ -7,49 +8,49 @@ const { ObjectId } = Schema.Types;
 const projectSchema = new Schema(
   {
     name: { type: String, required: true },
-    _createdBy: { type: ObjectId, required: true, ref: "User" },
+    _createdBy: { type: ObjectId, required: true, ref: 'User' },
     apiKey: { type: String, required: true },
     images: {
       type: [
         {
           small: {
             type: String,
-            required: String
+            required: String,
           },
           default: {
             type: String,
-            required: String
+            required: String,
           },
           large: {
             type: String,
-            required: String
+            required: String,
           },
           name: {
             type: String,
-            required: true
+            required: true,
           },
           env: {
             type: String,
-            required: true
+            required: true,
           },
           publicId: {
             type: String,
-            required: true
+            required: true,
           },
           diff: {
             type: Boolean,
             required: false,
-            default: false
-          }
-        }
+            default: false,
+          },
+        },
       ],
-      required: false
+      required: false,
     },
-    _team: { type: Schema.Types.ObjectId, required: false, ref: 'Team' }
+    _team: { type: Schema.Types.ObjectId, required: false, ref: 'Team' },
   },
-  { timestamps: true, strict: true }
+  { timestamps: true, strict: true },
 );
 
-const Project = mongoose.model("Project", projectSchema);
+const Project = mongoose.model('Project', projectSchema);
 
 module.exports = Project;
