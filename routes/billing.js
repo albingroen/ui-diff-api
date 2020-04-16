@@ -4,6 +4,7 @@ const {
   getProductPlans,
   getCustomerSubscriptions,
   connectCustomerPaymentMethod,
+  getCustomerPaymentMethods,
 } = require('../lib/billing');
 
 // Get all product plans
@@ -26,7 +27,7 @@ router.get('/:customerId/subscriptions', verify, async (req, res) => {
   });
 });
 
-// Create customer payment method
+// Connect customer payment method
 router.post('/:customerId/payment-methods', verify, async (req, res) => {
   const { customerId } = req.params;
 
@@ -37,6 +38,20 @@ router.post('/:customerId/payment-methods', verify, async (req, res) => {
 
   res.json({
     paymentMethod,
+  });
+});
+
+// Retrieve customer payment methods
+router.get('/:customerId/payment-methods/:type', verify, async (req, res) => {
+  const { customerId, type } = req.params;
+
+  const paymentMethods = await getCustomerPaymentMethods({
+    customerId,
+    type,
+  });
+
+  res.json({
+    paymentMethods,
   });
 });
 
