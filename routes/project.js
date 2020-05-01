@@ -20,7 +20,7 @@ router.post('/', verify, async (req, res) => {
 
   const project = await Project.create({
     name,
-    _team: team || undefined,
+    _team: team ? team._id : undefined,
     _createdBy: user._id,
     apiKey: uuidAPIKey.create().apiKey,
   });
