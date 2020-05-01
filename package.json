@@ -30,7 +30,6 @@
     "nodemon": "^2.0.2",
     "prettier": "^2.0.4",
     "query-string": "^6.9.0",
-    "stripe": "^8.39.1",
     "uuid": "^3.3.3",
     "uuid-apikey": "^1.4.6"
   },
