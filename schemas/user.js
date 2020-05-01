@@ -10,7 +10,6 @@ const userSchema = new Schema(
     avatar: { type: String, required: false },
     socialId: { type: String, required: false },
     password: { type: String, required: false },
-    stripeCustomerId: { type: String },
     confirmed: { type: Boolean, required: false, default: true },
   },
   { timestamps: true, strict: true },

@@ -4,7 +4,6 @@ const User = require('../schemas/user');
 const Team = require('../schemas/team');
 const { createTokens, setTokens } = require('../lib/auth');
 const { sendMail } = require('../lib/mail');
-const { createStripeCustomer, createSubcription } = require('../lib/billing');
 const welcome = require('../lib/email-templates/welcome');
 
 // Get user
@@ -46,22 +45,6 @@ router.post('/:id/confirm', async (req, res) => {
       process.env.JWT_SECRET,
       process.env.JWT_SECRET_2,
     );
-
-    // Create Stripe customer and update user
-    const customer = await createStripeCustomer({
-      name: updatedUser.name,
-      email: updatedUser.email,
-    });
-    await User.findOneAndUpdate(
-      { _id: updatedUser._id },
-      { stripeCustomerId: customer.id },
-    );
-
-    // Create subscription
-    await createSubcription({
-      customerId: customer.id,
-      items: [{ plan: 'free' }],
-    });
 
     // Set tokens
     setTokens(res, token, refreshToken);
