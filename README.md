@@ -1,5 +1,7 @@
 # ui-diff-api
 
+[![CircleCI](https://circleci.com/gh/albingroen/ui-diff-api.svg?style=svg&circle-token=b24528603db4a28b0de09e1618496cbe91535ec7)](LINK)
+
 Backend for the ui-diff platform built on
 
 - Ndoe
