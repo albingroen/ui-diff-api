@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const mongoose = require('mongoose');
+
+const { Schema } = mongoose;
 
 // create a schema
 const teamSchema = new Schema(
@@ -8,17 +9,17 @@ const teamSchema = new Schema(
     members: {
       type: [
         {
-          _user: { type: Schema.Types.ObjectId, ref: "User" },
-          role: { type: String, required: true }
-        }
+          _user: { type: Schema.Types.ObjectId, ref: 'User' },
+          role: { type: String, required: true },
+        },
       ],
-      required: true
+      required: true,
     },
-    logo: { type: String, required: false }
+    logo: { type: String, required: false },
   },
-  { timestamps: true, strict: true }
+  { timestamps: true, strict: true },
 );
 
-const Team = mongoose.model("Team", teamSchema);
+const Team = mongoose.model('Team', teamSchema);
 
 module.exports = Team;
