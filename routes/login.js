@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const uuid = require('uuid/v5');
+const { v5: uuid } = require('uuid');
 const { getRedirectUrl } = require('../lib/auth');
 
 const oauthBaseUrls = {
