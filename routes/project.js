@@ -201,14 +201,33 @@ router.patch('/:id', verify, async (req, res) => {
 
 // Update project token
 router.patch('/:id/updateToken', verify, async (req, res) => {
-  const project = await Project.findOneAndUpdate(
+  // Find current project
+  const project = await Project.findOne({
+    _id: req.params.id,
+    _createdBy: req.user._id,
+  });
+
+  // Find project team and chck if the
+  // user attempting patch is a admin
+  const team = project._team && (await Team.findOne({ _id: project._team }));
+  const teamMember = team.members.find(
+    (m) => String(m._user) === String(req.user._id),
+  );
+  const isAdmin = teamMember && teamMember.role === 'admin';
+
+  if (!isAdmin) {
+    return res.status(401).send();
+  }
+
+  // Patch project
+  const patchedProject = await Project.findOneAndUpdate(
     { _id: req.params.id, _createdBy: req.user._id },
     { apiKey: uuidAPIKey.create().apiKey },
     { new: true, useFindAndModify: false },
   );
 
   res.json({
-    project,
+    project: patchedProject,
   });
 });
 
