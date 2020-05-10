@@ -129,6 +129,9 @@ router.patch('/:id/update-member', verify, async (req, res) => {
     {
       $set: { 'members.$.role': req.body.newRole },
     },
+    {
+      new: true,
+    },
   ).populate('members._user');
 
   res.json({
@@ -149,7 +152,7 @@ router.patch('/:id/delete-member', verify, async (req, res) => {
     {
       new: true,
     },
-  );
+  ).populate('members._user');
 
   res.json({
     team,
