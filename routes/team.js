@@ -176,4 +176,20 @@ router.get('/:id/invitations', verify, async (req, res) => {
   });
 });
 
+// Delete a team
+router.delete('/:id', verify, async (req, res) => {
+  const { id } = req.params;
+  const { user } = req;
+
+  await Team.deleteOne({
+    _id: id,
+    'members._user': { $in: user._id },
+    'members.role': 'admin',
+  }).catch(() => res.status(401));
+
+  res.json({
+    isTeamDeleted: true,
+  });
+});
+
 module.exports = router;
