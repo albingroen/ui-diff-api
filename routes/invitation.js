@@ -99,7 +99,9 @@ router.delete('/:id', verify, async (req, res) => {
 
   await Invitation.findOneAndDelete({ _id: id, _team: { $in: userTeams } });
 
-  res.json();
+  res.json({
+    isTeamMemberInvitationDeleted: true,
+  });
 });
 
 module.exports = router;
