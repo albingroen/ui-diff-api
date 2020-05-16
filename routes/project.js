@@ -1,30 +1,22 @@
-/* eslint-disable no-console */
 const router = require('express').Router();
-const deepai = require('deepai');
-const cloudinary = require('cloudinary').v2; // Make sure to use v2
-const uuidAPIKey = require('uuid-apikey');
 const verify = require('./verifyToken');
-const Project = require('../schemas/project');
-const User = require('../schemas/user');
-const Team = require('../schemas/team');
-const { getImageUrlWithSize } = require('../lib/image');
-const { patchProjectToken, patchProject } = require('../lib/project');
-
-deepai.setApiKey(process.env.DEEP_AI_API_KEY);
+const {
+  patchProjectToken,
+  patchProject,
+  deleteProject,
+  getProject,
+  getUserProjects,
+  createProject,
+} = require('../lib/project');
+const { uploadProjectImage } = require('../lib/image');
 
 // Create a project
 router.post('/', verify, async (req, res) => {
-  const user = await User.findOne({ _id: req.user._id });
-  const { name, team: teamId } = req.body;
+  const project = await createProject(req.user._id, req.body);
 
-  const team = await Team.findOne({ _id: teamId });
-
-  const project = await Project.create({
-    name,
-    _team: team ? team._id : undefined,
-    _createdBy: user._id,
-    apiKey: uuidAPIKey.create().apiKey,
-  });
+  if (!project) {
+    return res.status(401).send();
+  }
 
   res.json({
     project,
@@ -33,35 +25,23 @@ router.post('/', verify, async (req, res) => {
 
 // Get all your projects
 router.get('/', verify, async (req, res) => {
-  const user = await User.findOne({ _id: req.user._id });
+  const projects = await getUserProjects(req.user._id);
 
-  const userTeams = await Team.find({
-    'members._user': { $in: user._id },
-  }).select('_id');
-
-  const teamProjects = await Project.find({
-    _team: { $in: userTeams },
-  });
-
-  const userProjects = await Project.find({
-    _team: null,
-    _createdBy: user._id,
-  });
+  if (!projects) {
+    return res.status(400).send();
+  }
 
   res.json({
-    projects: [...teamProjects, ...userProjects],
+    projects,
   });
 });
 
 // Get a project
 router.get('/:id', verify, async (req, res) => {
-  const project = await Project.findOne({ _id: req.params.id }).populate({
-    path: '_createdBy _team',
-    select: 'name',
-  });
+  const project = await getProject(req.params.id);
 
   if (!project) {
-    res.status(400).send();
+    return res.status(400).send();
   }
 
   res.json({
@@ -73,122 +53,24 @@ router.get('/:id', verify, async (req, res) => {
 router.post('/images', async (req, res) => {
   const apiToken = req.header('api-token');
 
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+  const project = await uploadProjectImage(req.body.image, req.body, apiToken);
+
+  res.json({
+    project,
   });
-
-  // Upload images to Cloudinary
-  cloudinary.uploader
-    .upload_stream(async (error, result) => {
-      if (error) return console.error(error);
-
-      if (result) {
-        const { name, env } = req.body;
-
-        const options = {
-          useFindAndModify: false,
-        };
-
-        // Find current image in project
-        const currentProject = await Project.findOne(
-          { apiKey: apiToken },
-          {
-            images: { $elemMatch: { name, env } },
-          },
-          options,
-        );
-
-        // Delete current image before uploading new version
-        let diff;
-
-        if (
-          currentProject
-          && currentProject.images
-          && currentProject.images.length
-        ) {
-          const currentImage = currentProject.images[0];
-
-          const images = {
-            image1: currentImage.default,
-            image2: result.secure_url,
-          };
-
-          diff = await deepai.callStandardApi('image-similarity', images);
-
-          await cloudinary.uploader.destroy(currentImage.publicId);
-        }
-
-        // Remove the image from the databse
-        const project = await Project.findOneAndUpdate(
-          { apiKey: apiToken },
-          {
-            $pull: { images: { name, env } },
-          },
-          options,
-        );
-
-        // Add the new image
-        await project.update(
-          {
-            $push: {
-              images: {
-                default: result.secure_url,
-                small: getImageUrlWithSize(result, 'sm'),
-                large: getImageUrlWithSize(result, 'lg'),
-                publicId: result.public_id,
-                name,
-                env,
-                diff: diff ? diff.output.distance !== 0 : false,
-              },
-            },
-          },
-          options,
-        );
-
-        res.json({
-          project,
-        });
-      }
-    })
-    .end(Buffer.from(req.body.image));
 });
 
 // Delete a project
 router.delete('/:id', verify, async (req, res) => {
-  const { id } = req.params;
-  const { user } = req;
+  const isProjectDeleted = await deleteProject(req.params.id, req.user._id);
 
-  const project = await Project.findOne({ _id: id });
-
-  if (project._team) {
-    const userTeams = await Team.find({
-      'members._user': { $in: user._id },
-    }).select('_id members');
-
-    const userAdminTeams = userTeams.filter((team) => team.members.find(
-      (member) => String(member._user) === user._id && member.role === 'admin',
-    ));
-
-    await Project.deleteOne({
-      _id: id,
-      _team: { $in: userAdminTeams },
-    }).catch(() => res.status(401));
-
-    res.json({
-      isProjectDeleted: true,
-    });
-  } else {
-    await Project.deleteOne({
-      _id: id,
-      _createdBy: user._id,
-    }).catch(() => res.status(401));
-
-    res.json({
-      isProjectDeleted: true,
-    });
+  if (!isProjectDeleted) {
+    return res.status(401).send();
   }
+
+  res.json({
+    isProjectDeleted,
+  });
 });
 
 // Update project
