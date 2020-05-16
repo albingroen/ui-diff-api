@@ -11,7 +11,7 @@ const { multerUploads } = require('../multer');
 router.post('/', verify, async (req, res) => {
   const { name } = req.body;
 
-  const team = await Team.create({
+  let team = await Team.create({
     name,
     members: [
       {
@@ -22,6 +22,8 @@ router.post('/', verify, async (req, res) => {
     _createdBy: req.user._id,
     logo: `https://eu.ui-avatars.com/api/?name=${name}`,
   });
+
+  team = await team.populate('members._user').execPopulate();
 
   res.json({
     team,
