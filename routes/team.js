@@ -1,11 +1,10 @@
 const router = require('express').Router();
-const cloudinary = require('cloudinary').v2; // Make sure to use v2
 const verify = require('./verifyToken');
 const Team = require('../schemas/team');
 const Project = require('../schemas/project');
 const Invitation = require('../schemas/invitation');
-const cloudinaryConfig = require('../cloudinaryConfig');
 const { multerUploads } = require('../multer');
+const { uploadImageToCloudinary } = require('../lib/image');
 
 // Create a team
 router.post('/', verify, async (req, res) => {
@@ -80,31 +79,26 @@ router.get('/', verify, async (req, res) => {
 // Update team
 router.patch('/:id', verify, multerUploads, async (req, res) => {
   if (req.file) {
-    cloudinary.config(cloudinaryConfig);
+    const image = await uploadImageToCloudinary(Buffer.from(req.file.buffer));
+    const team = await Team.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        'members._user': { $in: req.user._id },
+      },
+      {
+        ...req.body,
+        ...(image
+          ? {
+            logo: image.secure_url,
+          }
+          : {}),
+      },
+      { new: true },
+    ).populate('members._user');
 
-    cloudinary.uploader
-      .upload_stream(async (error, result) => {
-        const team = await Team.findOneAndUpdate(
-          {
-            _id: req.params.id,
-            'members._user': { $in: req.user._id },
-          },
-          {
-            ...req.body,
-            ...(result
-              ? {
-                logo: result.secure_url,
-              }
-              : {}),
-          },
-          { new: true },
-        ).populate('members._user');
-
-        res.json({
-          team,
-        });
-      })
-      .end(Buffer.from(req.file.buffer));
+    res.json({
+      team,
+    });
   } else {
     const team = await Team.findOneAndUpdate(
       {
