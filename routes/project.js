@@ -8,6 +8,7 @@ const Project = require('../schemas/project');
 const User = require('../schemas/user');
 const Team = require('../schemas/team');
 const { getImageUrlWithSize } = require('../lib/image');
+const { patchProjectToken, patchProject } = require('../lib/project');
 
 deepai.setApiKey(process.env.DEEP_AI_API_KEY);
 
@@ -192,66 +193,27 @@ router.delete('/:id', verify, async (req, res) => {
 
 // Update project
 router.patch('/:id', verify, async (req, res) => {
-  // Find current project
-  const project = await Project.findOne({
-    _id: req.params.id,
-    _createdBy: req.user._id,
-  });
+  const project = await patchProject(req.params.id, req.user._id, req.body);
 
-  // Find project team and chck if the
-  // user attempting patch is a admin
-  const team = project._team && (await Team.findOne({ _id: project._team }));
-  const teamMember = team.members.find(
-    (m) => String(m._user) === String(req.user._id),
-  );
-  const isAdmin = teamMember && teamMember.role === 'admin';
-
-  if (!isAdmin) {
+  if (!project) {
     return res.status(401).send();
   }
 
-  // Patch project
-  const patchedProject = await Project.findOneAndUpdate(
-    { _id: project._id },
-    req.body,
-    { new: true, useFindAndModify: false },
-  );
-
-  // Send patched project to client
   res.json({
-    project: patchedProject,
+    project,
   });
 });
 
 // Update project token
 router.patch('/:id/updateToken', verify, async (req, res) => {
-  // Find current project
-  const project = await Project.findOne({
-    _id: req.params.id,
-    _createdBy: req.user._id,
-  });
+  const project = await patchProjectToken(req.params.id, req.user._id);
 
-  // Find project team and chck if the
-  // user attempting patch is a admin
-  const team = project._team && (await Team.findOne({ _id: project._team }));
-  const teamMember = team.members.find(
-    (m) => String(m._user) === String(req.user._id),
-  );
-  const isAdmin = teamMember && teamMember.role === 'admin';
-
-  if (!isAdmin) {
+  if (!project) {
     return res.status(401).send();
   }
 
-  // Patch project
-  const patchedProject = await Project.findOneAndUpdate(
-    { _id: req.params.id, _createdBy: req.user._id },
-    { apiKey: uuidAPIKey.create().apiKey },
-    { new: true, useFindAndModify: false },
-  );
-
   res.json({
-    project: patchedProject,
+    project,
   });
 });
 
