@@ -3,6 +3,7 @@ const verify = require('./verifyToken');
 const Invitation = require('../schemas/invitation');
 const { sendMail } = require('../lib/mail');
 const Team = require('../schemas/team');
+const invitationTemplate = require('../lib/email-templates/invitation');
 
 // Create a invitation
 router.post('/', verify, async (req, res) => {
@@ -23,7 +24,7 @@ router.post('/', verify, async (req, res) => {
   sendMail(
     email,
     `You've been invited to ${team.name} on ui-diff!`,
-    `Welcome to ui-diff! Click the link to get up and running: https://app.ui-diff.com/login?invitation=${invitation._id}`,
+    invitationTemplate(invitation._id, team.name),
   );
 
   res.json({
