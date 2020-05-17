@@ -7,11 +7,15 @@ const { multerUploads } = require('../multer');
 const { uploadImageToCloudinary } = require('../lib/image');
 
 // Create a team
-router.post('/', verify, async (req, res) => {
-  const { name } = req.body;
+router.post('/', verify, multerUploads, async (req, res) => {
+  let logo;
+
+  if (req.file) {
+    logo = await uploadImageToCloudinary(Buffer.from(req.file.buffer));
+  }
 
   let team = await Team.create({
-    name,
+    name: req.body.name,
     members: [
       {
         role: 'admin',
@@ -19,7 +23,9 @@ router.post('/', verify, async (req, res) => {
       },
     ],
     _createdBy: req.user._id,
-    logo: `https://eu.ui-avatars.com/api/?name=${name}`,
+    logo: logo
+      ? logo.secure_url
+      : `https://eu.ui-avatars.com/api/?name=${req.body.name}`,
   });
 
   team = await team.populate('members._user').execPopulate();
