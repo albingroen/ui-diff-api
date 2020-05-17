@@ -231,6 +231,11 @@ router.post('/email/signup', async (req, res) => {
       emailConfirmation(`${clientUrl}/confirmation/${newUser._id}`),
     );
 
+    if (req.body.invitationId) {
+      const { invitationId } = req.body;
+      await acceptInvitation(invitationId, newUser._id);
+    }
+
     res.status(200).send('Success');
   }
 });
