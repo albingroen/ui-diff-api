@@ -14,8 +14,11 @@ const clientIds = {
   google: process.env.GOOGLE_CLIENT_ID,
 };
 
+const getState = (invitationId) => (invitationId ? `${uuid.URL}invitationId${invitationId}` : uuid.URL);
+
 router.get('/:method', (req, res) => {
   const { method } = req.params;
+  const { invitationId } = req.query;
 
   const client_id = clientIds[method];
 
@@ -28,21 +31,24 @@ router.get('/:method', (req, res) => {
           oauthBaseUrls.github
         }?scope=user&client_id=${client_id}&redirect_uri=${getRedirectUrl(
           'github',
-        )}&state=${uuid.URL}`;
+          invitationId,
+        )}&state=${getState(invitationId)}`;
         break;
       case 'gitlab':
         authUrl = `${
           oauthBaseUrls.gitlab
         }?client_id=${client_id}&redirect_uri=${getRedirectUrl(
           'gitlab',
-        )}&response_type=code&state=${uuid.URL}&scope=read_user`;
+          invitationId,
+        )}&response_type=code&state=${getState(invitationId)}&scope=read_user`;
         break;
       case 'google':
         authUrl = `${
           oauthBaseUrls.google
         }?scope=profile+email&response_type=code&client_id=${client_id}&redirect_uri=${getRedirectUrl(
           'google',
-        )}&state=${uuid.URL}`;
+          invitationId,
+        )}&state=${getState(invitationId)}`;
         break;
 
       default:
