@@ -16,6 +16,7 @@ const {
 const { clientUrl } = require('../lib/env');
 const { sendMail } = require('../lib/mail');
 const { getAvatarFromEmail } = require('../lib/user');
+const { acceptInvitation } = require('../lib/invitation');
 const emailConfirmation = require('../lib/email-templates/email-confirmation');
 const passwordReset = require('../lib/email-templates/password-reset');
 
@@ -48,6 +49,11 @@ router.post('/github', (req, res) => {
               avatar: userRes.data.avatar_url,
               socialId: userRes.data.id,
             });
+
+            if (req.body.invitationId) {
+              const { invitationId } = req.body;
+              await acceptInvitation(invitationId, user._id);
+            }
           }
 
           const { token: authToken, refreshToken } = createTokens(
@@ -102,6 +108,11 @@ router.post('/gitlab', (req, res) => {
               avatar: userRes.data.avatar_url,
               socialId: userRes.data.id,
             });
+
+            if (req.body.invitationId) {
+              const { invitationId } = req.body;
+              await acceptInvitation(invitationId, user._id);
+            }
           }
 
           const { token: authToken, refreshToken } = createTokens(
@@ -156,6 +167,11 @@ router.post('/google', (req, res) => {
               avatar: userRes.data.picture,
               socialId: userRes.data.id,
             });
+
+            if (req.body.invitationId) {
+              const { invitationId } = req.body;
+              await acceptInvitation(invitationId, user._id);
+            }
           }
 
           const { token: authToken, refreshToken } = createTokens(
@@ -214,6 +230,11 @@ router.post('/email/signup', async (req, res) => {
       'Confirm email on ui-diff',
       emailConfirmation(`${clientUrl}/confirmation/${newUser._id}`),
     );
+
+    if (req.body.invitationId) {
+      const { invitationId } = req.body;
+      await acceptInvitation(invitationId, newUser._id);
+    }
 
     res.status(200).send('Success');
   }
