@@ -4,6 +4,8 @@ const User = require('../schemas/user');
 const Team = require('../schemas/team');
 const { createTokens, setTokens } = require('../lib/auth');
 const { sendMail } = require('../lib/mail');
+const { multerUploads } = require('../multer');
+const { uploadImageToCloudinary } = require('../lib/image');
 const welcome = require('../lib/email-templates/welcome');
 
 // Get user
@@ -18,6 +20,32 @@ router.get('/', verify, async (req, res) => {
       ...user.toObject(),
       teams,
     },
+  });
+});
+
+// Patch user
+router.patch('/:id', verify, multerUploads, async (req, res) => {
+  let image;
+
+  if (req.file) {
+    image = await uploadImageToCloudinary(Buffer.from(req.file.buffer));
+  }
+
+  const user = await User.findOneAndUpdate(
+    { _id: req.params.id },
+    {
+      ...req.body,
+      ...(image ? { avatar: image.secure_url } : {}),
+    },
+    { new: true },
+  );
+
+  if (!user) {
+    return res.status(400).send();
+  }
+
+  res.json({
+    user,
   });
 });
 
