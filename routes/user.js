@@ -91,4 +91,13 @@ router.post('/:id/confirm', async (req, res) => {
   }
 });
 
+// Delete user
+router.delete('/:id', verify, async (req, res) => {
+  await User.deleteOne({ _id: req.user._id });
+
+  res.json({
+    isUserDeleted: true,
+  });
+});
+
 module.exports = router;
