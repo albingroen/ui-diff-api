@@ -10,7 +10,7 @@ require('./db');
 
 const corsOptions = {
   credentials: true,
-  origin: true,
+  origin: 'https://app.ui-diff.com',
 };
 
 app.use((req, res, next) => {
