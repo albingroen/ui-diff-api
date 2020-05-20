@@ -12,6 +12,7 @@ require('./db');
 
 const corsOptions = {
   credentials: true,
+  origin: true,
 };
 
 app.use(cookieParser());
