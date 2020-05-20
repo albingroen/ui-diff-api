@@ -8,18 +8,10 @@ const port = process.env.PORT || 5000;
 require('dotenv').config();
 require('./db');
 
-const whitelist = ['http://localhost:3000', 'https://app.ui-diff.com'];
+// const whitelist = ['http://localhost:3000', 'https://app.ui-diff.com'];
 
 const corsOptions = {
   credentials: true,
-  origin: (origin, callback) => {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log('Not allowed by CORS');
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
 };
 
 app.use(cookieParser());
