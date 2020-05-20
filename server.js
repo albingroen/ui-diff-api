@@ -19,16 +19,6 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true, limit: '500mb' }));
 app.use(bodyParser.json({ limit: '500mb', extended: true }));
 
-app.use((req, res, next) => {
-  res.header('Content-Type', 'application/json;charset=UTF-8');
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept',
-  );
-  next();
-});
-
 app.use(cors(corsOptions));
 
 // Routes
