@@ -3,6 +3,7 @@ const app = require('express')();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const { env } = require('./lib/env');
 
 const port = process.env.PORT || 5000;
 require('dotenv').config();
@@ -30,7 +31,11 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Credentials', true);
   res.header(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept',
+    'X-Requested-With, Content-Type, Accept',
+  );
+  res.header(
+    'Access-Control-Allow-Origin',
+    env === 'live' ? 'https://app.ui-diff.com' : 'http://localhost:3000',
   );
   next();
 });
