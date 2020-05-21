@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 require('dotenv').config();
 require('./db');
 
-const whitelist = ['http://localhost:3000', 'https://ui-diff.com'];
+const whitelist = ['http://localhost:3000', 'https://app.ui-diff.com'];
 
 const corsOptions = {
   credentials: true,
