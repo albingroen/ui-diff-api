@@ -3,13 +3,13 @@ const app = require('express')();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const { env } = require('./lib/env');
+const { envs, env } = require('./lib/env');
 
 const port = process.env.PORT || 5000;
 require('dotenv').config();
 require('./db');
 
-const whitelist = ['http://localhost:3000', 'https://app.ui-diff.com'];
+const whitelist = [envs.local, envs.live];
 
 const corsOptions = {
   credentials: true,
@@ -35,7 +35,7 @@ app.use((req, res, next) => {
   );
   res.header(
     'Access-Control-Allow-Origin',
-    env === 'live' ? 'https://app.ui-diff.com' : 'http://localhost:3000',
+    env === 'live' ? envs.live : envs.local,
   );
   next();
 });
