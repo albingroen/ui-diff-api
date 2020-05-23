@@ -7,8 +7,6 @@ const User = require('../schemas/user');
 const PasswordReset = require('../schemas/password-reset');
 const {
   createTokens,
-  setTokens,
-  clearTokens,
   getRedirectUrl,
   validatePassword,
   passwordResetIsValid,
@@ -62,10 +60,10 @@ router.post('/github', (req, res) => {
             process.env.JWT_SECRET_2,
           );
 
-          setTokens(res, authToken, refreshToken);
-
           res.send({
             user,
+            authToken,
+            refreshToken,
           });
         })
         .catch((err) => {
@@ -121,10 +119,10 @@ router.post('/gitlab', (req, res) => {
             process.env.JWT_SECRET_2,
           );
 
-          setTokens(res, authToken, refreshToken);
-
           res.send({
             user,
+            authToken,
+            refreshToken,
           });
         })
         .catch((err) => {
@@ -180,10 +178,10 @@ router.post('/google', (req, res) => {
             process.env.JWT_SECRET_2,
           );
 
-          setTokens(res, authToken, refreshToken);
-
           res.send({
             user,
+            authToken,
+            refreshToken,
           });
         })
         .catch((err) => {
@@ -259,16 +257,16 @@ router.post('/email/login', async (req, res) => {
 
   if (passwordsMatch) {
     if (user.confirmed) {
-      const { token, refreshToken } = createTokens(
+      const { token: authToken, refreshToken } = createTokens(
         user,
         process.env.JWT_SECRET,
         process.env.JWT_SECRET_2,
       );
 
-      setTokens(res, token, refreshToken);
-
       res.send({
         user,
+        authToken,
+        refreshToken,
       });
     } else {
       res.status(400).send({ error: 'email-not-confirmed' });
@@ -336,16 +334,16 @@ router.post('/email/reset/confirm', async (req, res) => {
 
       await PasswordReset.updateOne({ _id: pr._id }, { validThru: new Date() });
 
-      const { token, refreshToken } = createTokens(
+      const { token: authToken, refreshToken } = createTokens(
         updatedUser,
         process.env.JWT_SECRET,
         process.env.JWT_SECRET_2,
       );
 
-      setTokens(res, token, refreshToken);
-
       res.send({
         user: updatedUser,
+        authToken,
+        refreshToken,
       });
     } else {
       res.status(400).send({ error: 'email-not-confirmed' });
@@ -374,7 +372,6 @@ router.get('/email/reset/:id', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  clearTokens(res);
   res.status(200).send();
 });
 
