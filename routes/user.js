@@ -10,9 +10,6 @@ const welcome = require('../lib/email-templates/welcome');
 
 // Get user
 router.get('/', verify, async (req, res) => {
-  console.log({
-    user: req.user
-  })
   const user = await User.findOne({ _id: req.user._id });
   const teams = await Team.find({
     'members._user': { $in: user._id },
