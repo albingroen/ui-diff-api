@@ -2,7 +2,7 @@ const router = require('express').Router();
 const verify = require('./verifyToken');
 const User = require('../schemas/user');
 const Team = require('../schemas/team');
-const { createTokens, setTokens } = require('../lib/auth');
+const { createTokens } = require('../lib/auth');
 const { sendMail } = require('../lib/mail');
 const { multerUploads } = require('../multer');
 const { uploadImageToCloudinary } = require('../lib/image');
@@ -68,14 +68,11 @@ router.post('/:id/confirm', async (req, res) => {
     );
 
     // Create user
-    const { token, refreshToken } = createTokens(
+    const { token: authToken, refreshToken } = createTokens(
       updatedUser,
       process.env.JWT_SECRET,
       process.env.JWT_SECRET_2,
     );
-
-    // Set tokens
-    setTokens(res, token, refreshToken);
 
     // Send welcome email
     sendMail(
@@ -87,6 +84,8 @@ router.post('/:id/confirm', async (req, res) => {
     // Return user
     res.send({
       user: updatedUser,
+      authToken,
+      refreshToken,
     });
   }
 });

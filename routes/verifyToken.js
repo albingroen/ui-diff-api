@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const { createTokens, setTokens, clearTokens } = require('../lib/auth');
+const { clearTokens, getCookie } = require('../lib/auth');
 
 const secret1 = process.env.JWT_SECRET;
 const secret2 = process.env.JWT_SECRET_2;
 
 module.exports = (req, res, next) => {
-  const token = req.cookies['x-token'];
-  const refreshToken = req.cookies['x-refresh-token'];
+  const token = getCookie(req.headers.cookie, 'x-token');
+  const refreshToken = getCookie(req.headers.cookie, 'x-refresh-token');
 
   if (!token) return res.status(401).send('Access denied');
 
@@ -20,8 +20,11 @@ module.exports = (req, res, next) => {
     }
     try {
       const verified2 = jwt.verify(refreshToken, secret2);
-      const newTokens = createTokens(verified2, secret1, secret2);
-      setTokens(res, newTokens.token, newTokens.refreshToken);
+
+      // TODO: Update this
+      // const newTokens = createTokens(verified2, secret1, secret2);
+      // setTokens(res, newTokens.token, newTokens.refreshToken);
+
       req.user = verified2;
       next();
     } catch (err2) {
