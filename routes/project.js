@@ -8,7 +8,7 @@ const {
   getUserProjects,
   createProject,
 } = require('../lib/project');
-const { uploadProjectImage } = require('../lib/image');
+const { uploadProjectScreenshot } = require('../lib/image');
 
 // Create a project
 router.post('/', verify, async (req, res) => {
@@ -53,7 +53,11 @@ router.get('/:id', verify, async (req, res) => {
 router.post('/images', async (req, res) => {
   const apiToken = req.header('api-token');
 
-  const project = await uploadProjectImage(req.body.image, req.body, apiToken);
+  const project = await uploadProjectScreenshot(
+    req.body.image,
+    req.body,
+    apiToken,
+  );
 
   res.json({
     project,
