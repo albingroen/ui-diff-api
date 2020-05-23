@@ -12,6 +12,9 @@ module.exports = (req, res, next) => {
 
   try {
     const verified = jwt.verify(token, secret1);
+    console.log({
+      verified,
+    });
     req.user = verified;
     next();
   } catch (err) {
@@ -20,6 +23,10 @@ module.exports = (req, res, next) => {
     }
     try {
       const verified2 = jwt.verify(refreshToken, secret2);
+
+      console.log({
+        verified2,
+      });
 
       // TODO: Update this
       // const newTokens = createTokens(verified2, secret1, secret2);
