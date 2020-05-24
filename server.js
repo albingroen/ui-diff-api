@@ -14,6 +14,9 @@ const whitelist = [envs.local, envs.live];
 const corsOptions = {
   credentials: true,
   origin: (origin, callback) => {
+    console.log({
+      origin
+    })
     if (!origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
