@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const { clearTokens } = require('../lib/auth');
 
 const secret1 = process.env.JWT_SECRET;
 const secret2 = process.env.JWT_SECRET_2;
@@ -20,15 +19,9 @@ module.exports = (req, res, next) => {
     }
     try {
       const verified2 = jwt.verify(refreshToken, secret2);
-
-      // TODO: Update this
-      // const newTokens = createTokens(verified2, secret1, secret2);
-      // setTokens(res, newTokens.token, newTokens.refreshToken);
-
       req.user = verified2;
       next();
     } catch (err2) {
-      clearTokens(res);
       return res.status(400).send('Expired token');
     }
   }
