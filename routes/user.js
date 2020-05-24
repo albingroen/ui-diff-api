@@ -68,7 +68,7 @@ router.post('/:id/confirm', async (req, res) => {
     );
 
     // Create user
-    const { token: authToken, refreshToken } = createTokens(
+    const { token: authToken } = createTokens(
       updatedUser,
       process.env.JWT_SECRET,
       process.env.JWT_SECRET_2,
@@ -85,7 +85,6 @@ router.post('/:id/confirm', async (req, res) => {
     res.send({
       user: updatedUser,
       authToken,
-      refreshToken,
     });
   }
 });

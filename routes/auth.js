@@ -54,7 +54,7 @@ router.post('/github', (req, res) => {
             }
           }
 
-          const { token: authToken, refreshToken } = createTokens(
+          const { token: authToken } = createTokens(
             user,
             process.env.JWT_SECRET,
             process.env.JWT_SECRET_2,
@@ -63,7 +63,6 @@ router.post('/github', (req, res) => {
           res.send({
             user,
             authToken,
-            refreshToken,
           });
         })
         .catch((err) => {
@@ -113,7 +112,7 @@ router.post('/gitlab', (req, res) => {
             }
           }
 
-          const { token: authToken, refreshToken } = createTokens(
+          const { token: authToken } = createTokens(
             user,
             process.env.JWT_SECRET,
             process.env.JWT_SECRET_2,
@@ -122,7 +121,6 @@ router.post('/gitlab', (req, res) => {
           res.send({
             user,
             authToken,
-            refreshToken,
           });
         })
         .catch((err) => {
@@ -172,7 +170,7 @@ router.post('/google', (req, res) => {
             }
           }
 
-          const { token: authToken, refreshToken } = createTokens(
+          const { token: authToken } = createTokens(
             user,
             process.env.JWT_SECRET,
             process.env.JWT_SECRET_2,
@@ -181,7 +179,6 @@ router.post('/google', (req, res) => {
           res.send({
             user,
             authToken,
-            refreshToken,
           });
         })
         .catch((err) => {
@@ -257,7 +254,7 @@ router.post('/email/login', async (req, res) => {
 
   if (passwordsMatch) {
     if (user.confirmed) {
-      const { token: authToken, refreshToken } = createTokens(
+      const { token: authToken } = createTokens(
         user,
         process.env.JWT_SECRET,
         process.env.JWT_SECRET_2,
@@ -266,7 +263,6 @@ router.post('/email/login', async (req, res) => {
       res.send({
         user,
         authToken,
-        refreshToken,
       });
     } else {
       res.status(400).send({ error: 'email-not-confirmed' });
@@ -334,7 +330,7 @@ router.post('/email/reset/confirm', async (req, res) => {
 
       await PasswordReset.updateOne({ _id: pr._id }, { validThru: new Date() });
 
-      const { token: authToken, refreshToken } = createTokens(
+      const { token: authToken } = createTokens(
         updatedUser,
         process.env.JWT_SECRET,
         process.env.JWT_SECRET_2,
@@ -343,7 +339,6 @@ router.post('/email/reset/confirm', async (req, res) => {
       res.send({
         user: updatedUser,
         authToken,
-        refreshToken,
       });
     } else {
       res.status(400).send({ error: 'email-not-confirmed' });
