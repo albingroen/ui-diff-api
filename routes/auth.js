@@ -11,7 +11,7 @@ const {
   validatePassword,
   passwordResetIsValid,
 } = require('../lib/auth');
-const { clientUrl } = require('../lib/env');
+const { clientUrl, env } = require('../lib/env');
 const { sendMail } = require('../lib/mail');
 const { getAvatarFromEmail } = require('../lib/user');
 const { acceptInvitation } = require('../lib/invitation');
@@ -19,8 +19,8 @@ const emailConfirmation = require('../lib/email-templates/email-confirmation');
 const passwordReset = require('../lib/email-templates/password-reset');
 
 router.post('/github', (req, res) => {
-  const client_id = process.env.GITHUB_CLIENT_ID;
-  const client_secret = process.env.GITHUB_CLIENT_SECRET;
+  const client_id = process.env[`GITHUB_${env.toUpperCase()}_CLIENT_ID`];
+  const client_secret = process.env[`GITHUB_${env.toUpperCase()}_CLIENT_SECRET`];
 
   axios
     .post('https://github.com/login/oauth/access_token', {
@@ -75,8 +75,8 @@ router.post('/github', (req, res) => {
 });
 
 router.post('/gitlab', (req, res) => {
-  const client_id = process.env.GITLAB_CLIENT_ID;
-  const client_secret = process.env.GITLAB_CLIENT_SECRET;
+  const client_id = process.env[`GITLAB_${env.toUpperCase()}_CLIENT_ID`];
+  const client_secret = process.env[`GITLAB_${env.toUpperCase()}_CLIENT_SECRET`];
 
   axios
     .post('https://gitlab.com/oauth/token', {
@@ -133,8 +133,8 @@ router.post('/gitlab', (req, res) => {
 });
 
 router.post('/google', (req, res) => {
-  const client_id = process.env.GOOGLE_CLIENT_ID;
-  const client_secret = process.env.GOOGLE_CLIENT_SECRET;
+  const client_id = process.env[`GOOGLE_${env.toUpperCase()}_CLIENT_ID`];
+  const client_secret = process.env[`GOOGLE_${env.toUpperCase()}_CLIENT_SECRET`];
 
   axios
     .post('https://oauth2.googleapis.com/token', {

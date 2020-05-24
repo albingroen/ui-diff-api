@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { v5: uuid } = require('uuid');
 const { getRedirectUrl } = require('../lib/auth');
+const { env } = require('../lib/env');
 
 const oauthBaseUrls = {
   github: 'https://github.com/login/oauth/authorize',
@@ -9,9 +10,9 @@ const oauthBaseUrls = {
 };
 
 const clientIds = {
-  github: process.env.GITHUB_CLIENT_ID,
-  gitlab: process.env.GITLAB_CLIENT_ID,
-  google: process.env.GOOGLE_CLIENT_ID,
+  github: process.env[`GITHUB_${env.toUpperCase()}_CLIENT_ID`],
+  gitlab: process.env[`GITLAB_${env.toUpperCase()}_CLIENT_ID`],
+  google: process.env[`GOOGLE_${env.toUpperCase()}_CLIENT_ID`],
 };
 
 const getState = (invitationId) => (invitationId ? `${uuid.URL}invitationId${invitationId}` : uuid.URL);
