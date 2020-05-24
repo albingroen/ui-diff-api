@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
-const { clearTokens, getCookie } = require('../lib/auth');
+const { clearTokens } = require('../lib/auth');
 
 const secret1 = process.env.JWT_SECRET;
 const secret2 = process.env.JWT_SECRET_2;
 
 module.exports = (req, res, next) => {
-  const token = getCookie(req.headers.cookie, 'x-token');
-  const refreshToken = getCookie(req.headers.cookie, 'x-refresh-token');
+  const token = req.header('x-token');
+  const refreshToken = req.header('x-refresh-token');
 
   if (!token) return res.status(401).send('Access denied');
 
