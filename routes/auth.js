@@ -41,8 +41,8 @@ router.post('/github', (req, res) => {
           });
 
           console.log({
-            user
-          })
+            user,
+          });
 
           if (!user) {
             user = await User.create({
@@ -63,6 +63,11 @@ router.post('/github', (req, res) => {
             process.env.JWT_SECRET,
             process.env.JWT_SECRET_2,
           );
+
+          console.log({
+            authToken,
+            refreshToken,
+          });
 
           res.send({
             user,
