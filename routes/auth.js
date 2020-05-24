@@ -40,6 +40,10 @@ router.post('/github', (req, res) => {
             $or: [{ email: userRes.data.email }, { socialId: userRes.data.id }],
           });
 
+          console.log({
+            user
+          })
+
           if (!user) {
             user = await User.create({
               name: userRes.data.name || userRes.data.login,
