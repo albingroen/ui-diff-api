@@ -5,7 +5,7 @@ const {
   DB_USER, DB_PASSWORD, DB_HOST, DB_NAME,
 } = process.env;
 
-const mongoUrl = `mongodb://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}`;
+const mongoUrl = `mongodb+srv://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?retryWrites=true&w=majority`;
 
 mongoose.connect(mongoUrl, { useNewUrlParser: true, useFindAndModify: false });
 
