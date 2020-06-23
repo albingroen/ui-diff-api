@@ -35,8 +35,8 @@
     "uuid-apikey": "^1.4.6"
   },
   "devDependencies": {
+    "eslint-config-airbnb-base": "14.2.0",
     "eslint": "7.3.1",
-    "eslint-config-airbnb-base": "14.1.0",
     "eslint-plugin-import": "2.21.2"
   },
   "husky": {
