@@ -20,7 +20,7 @@
     "deepai": "^1.0.15",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "husky": "^4.2.5",
+    "husky": "^7.0.0",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.2.1",
     "minimist": "^1.2.5",
